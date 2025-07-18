@@ -8,7 +8,7 @@ class Entity{
         float _dy;
     public:
         Entity(float dx = 0.f, float dy = 0.f) : _dx(dx), _dy(dy) {} 
-        virtual void move(std::string direction) =0;
+        virtual void move(std::string direction){};
         virtual void draw(sf::RenderWindow& window) =0;
         virtual ~Entity() = default;
 };
