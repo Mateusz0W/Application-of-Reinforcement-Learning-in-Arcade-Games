@@ -1,9 +1,9 @@
 #pragma once
-#include "Jumpman.hpp"
 #include "Entity.hpp"
 #include <vector>
 #include <string>
 #include <memory>
+#include "Jumpman.hpp"
 
 class Simulation{
     private:
@@ -15,4 +15,5 @@ class Simulation{
         void nextStep();
         std::string keyboardControl();
         const std::vector<std::unique_ptr<Entity>>& getEntities() const ;
+        void loadMapFromJson(std::string fileName);
 };
