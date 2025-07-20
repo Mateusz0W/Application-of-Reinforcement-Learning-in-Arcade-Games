@@ -13,11 +13,18 @@ void Simulation::run(){
 }
 
 void Simulation::nextStep(){
+    bool groundContact = false;
+    bool stairsContact = false;
+    Jumpman* jm = dynamic_cast<Jumpman*>(_entities[0].get());
     for (const auto& entity :this->_entities){
-        if(Jumpman* jm = dynamic_cast<Jumpman*>(entity.get())){
-            jm->move(keyboardControl());
-        }
+        if(jm == entity.get())
+            continue;
+        groundContact |= this->_entities[0]->checkCollision(entity.get(),jm->getCollisionBox("groundBox"));
+        stairsContact |= this->_entities[0]->checkCollision(entity.get(),jm->getCollisionBox("sideBox"));
     }
+    jm->move(keyboardControl());
+    jm->moveOnStairs(stairsContact);
+    this->_entities[0]->gravity(groundContact);
 }
 
 string Simulation::keyboardControl(){
