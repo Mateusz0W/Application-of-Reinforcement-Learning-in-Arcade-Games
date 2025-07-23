@@ -7,7 +7,7 @@ int main(void){
     entities.push_back(make_unique<Jumpman>());
     Simulation simulation(std::move(entities));
     simulation.loadMapFromJson("../map.json");
-    Renderer renderer(simulation,1500,1500);
+    Renderer renderer(simulation,1500,1700);
 
     //simulation.run();
     renderer.run();
