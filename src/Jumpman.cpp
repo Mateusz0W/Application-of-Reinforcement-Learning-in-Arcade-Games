@@ -11,6 +11,8 @@ void Jumpman::move(string direction){
         this->_dy -= 1.;
     else if (direction == "Down")
         this->_dy +=1.;
+    else if (direction == "Jump" || this->jumping)
+        this->jump();
 }
 
 void Jumpman::draw(sf::RenderWindow& window){
@@ -36,9 +38,29 @@ CollisionBox Jumpman::getCollisionBox(string box){
             this->_dy + this->_height * 0.9 // yMin
         );
     }
+    else if (box == "ladderBox"){
+        return CollisionBox(
+            this->_dx + this->_width - 20,      //xMax
+            this->_dx + 20,                     //xMin
+            this->_dy + this->_height - 20,     //yMax
+            this->_dy + 20                      //yMin
+        );
+    }
     throw std::invalid_argument("Unknown collision box: " + box);
 }
 void Jumpman::moveOnStairs(bool stairsContact){
     if (stairsContact)
         this->_dy -= 11;
+}
+void Jumpman::jump(){
+    static int counter = 0;
+    if (counter <100){
+        this->_dy-=3;
+        this->jumping = true;
+        counter ++;
+    }
+    else{
+        counter = 0;
+        this->jumping = false;
+    }
 }
