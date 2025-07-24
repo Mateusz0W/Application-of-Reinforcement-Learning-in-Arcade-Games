@@ -32,7 +32,8 @@ void Simulation::nextStep(){
         
     }
     string moveDirection = keyboardControl();
-    if (moveDirection == "Jump" && !groundContact)
+    // first condition prevents from double jump. Second  condition prevents form stay in air.
+    if ((moveDirection == "Jump" && !groundContact) || (moveDirection == "Up" && !groundContact))
         moveDirection = "";
     jm->move(moveDirection);
     jm->moveOnStairs(stairsContact);
