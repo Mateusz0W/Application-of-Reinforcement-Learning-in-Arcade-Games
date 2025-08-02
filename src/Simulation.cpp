@@ -1,8 +1,10 @@
 #include "Simulation.hpp"
 #include "Obstacle.hpp"
+#include "Barrel.hpp"
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <random>
 
 
 using namespace std;
@@ -10,35 +12,50 @@ using json = nlohmann::json;
 
 void Simulation::run(){
     nextStep();
+    addBarrel();
+
 }
 
 void Simulation::nextStep(){
-    bool groundContact = false;
-    bool stairsContact = false;
-    bool ladderContact = false;
     Jumpman* jm = dynamic_cast<Jumpman*>(_entities[0].get());
     for (const auto& entity :this->_entities){
         if(jm == entity.get())
             continue;
         else if(Obstacle *obs = dynamic_cast<Obstacle*>(entity.get())){
             if (obs->getType() == "platform"){
-                groundContact |= jm->checkCollision(obs,jm->getCollisionBox("groundBox"));
-                stairsContact |= jm->checkCollision(obs,jm->getCollisionBox("sideBox"));
+                jm->groundContact |= jm->checkCollision(obs,jm->getCollisionBox("groundBox"));
+                jm->stairsContact |= jm->checkCollision(obs,jm->getCollisionBox("sideBox"));
             }
             else if (obs->getType() == "ladder"){
-                ladderContact |= jm->checkCollision(obs,jm->getCollisionBox("ladderBox"));
+                jm->ladderContact |= jm->checkCollision(obs,jm->getCollisionBox("ladderBox"));
             }
         }
-        
+        else if(Barrel *brl = dynamic_cast<Barrel*>(entity.get())){
+            if(brl->checkCollision(jm)){
+                // TODO: implement end game logic
+            }
+            for(int i=1;i<_entities.size();i++){
+                if(dynamic_cast<Barrel*>(_entities[i].get()))
+                    break;
+                brl->groundContact |= brl->checkCollision(_entities[i].get());
+            }
+            brl->move(brl->chooseMoveDirection());
+            brl->gravity();
+        }
     }
     string moveDirection = keyboardControl();
-    // first condition prevents from double jump. Second  condition prevents form stay in air.
-    if ((moveDirection == "Jump" && !groundContact) || (moveDirection == "Up" && !groundContact))
+    // first condition prevents from double jump. Second  condition prevents form stay in the air.
+    if ((moveDirection == "Jump" && !jm->groundContact) /*|| (moveDirection == "Up" && !groundContact)*/)
         moveDirection = "";
     jm->move(moveDirection);
-    jm->moveOnStairs(stairsContact);
-    if (moveDirection != "Up" || !ladderContact)
-        jm->gravity(groundContact);
+    jm->moveOnStairs();
+    if (moveDirection != "Up" || !jm->ladderContact)
+        jm->gravity();
+
+    // TODO: Implement flag reset
+    jm->stairsContact = false;
+    for(const auto& entity :this->_entities)
+        entity.get()->resetFlags();
 }
 
 string Simulation::keyboardControl(){
@@ -79,5 +96,15 @@ void Simulation::loadMapFromJson(string fileName){
             obs["type"].get<string>()
         ));
     }
+}
 
+void Simulation::addBarrel(){
+    static int counter = 0;
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist(0,50);
+    if(dist(gen) == 1 && counter < 1){
+        _entities.push_back(make_unique<Barrel>(100,245,35));
+        counter ++;
+    }
 }

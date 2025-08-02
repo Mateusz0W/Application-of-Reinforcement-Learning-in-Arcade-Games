@@ -16,4 +16,5 @@ class Simulation{
         std::string keyboardControl();
         const std::vector<std::unique_ptr<Entity>>& getEntities() const ;
         void loadMapFromJson(std::string fileName);
+        void addBarrel();
 };
