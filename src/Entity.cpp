@@ -8,7 +8,7 @@ bool Entity::checkCollision(Entity *entity,CollisionBox box){
         box.yMin < entity->getY() + entity->getHeight()
     );
 }
-void Entity::gravity(bool groundContact){
+void Entity::gravity(){
     if (!groundContact)
         this->_dy++;
 }
@@ -23,4 +23,8 @@ float Entity::getWidth(){
 }
 float Entity::getHeight(){
     return _height;
+}
+void Entity::resetFlags(){
+    this->ladderContact=false;
+    this->groundContact=false;
 }

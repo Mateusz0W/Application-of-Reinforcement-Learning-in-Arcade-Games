@@ -48,7 +48,7 @@ CollisionBox Jumpman::getCollisionBox(string box){
     }
     throw std::invalid_argument("Unknown collision box: " + box);
 }
-void Jumpman::moveOnStairs(bool stairsContact){
+void Jumpman::moveOnStairs(){
     if (stairsContact)
         this->_dy -= 11;
 }
