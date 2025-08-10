@@ -331,16 +331,16 @@
         },
         {
             "x": 1225,
-            "y": 360,
+            "y": 310,
             "width" : 50,
-            "height" : 130,
+            "height" : 180,
             "type": "ladder"
         },
         {
             "x": 450,
-            "y": 330,
+            "y": 280,
             "width" : 50,
-            "height" : 50,
+            "height" : 100,
             "type": "ladder"
         },
         {
@@ -352,23 +352,23 @@
         },
         {
             "x": 250,
-            "y": 590,
+            "y": 540,
             "width" : 50,
-            "height" : 110,
+            "height" : 160,
             "type": "ladder"
         },
         {
             "x": 575,
-            "y": 570,
+            "y": 520,
             "width" : 50,
-            "height" : 150,
+            "height" : 200,
             "type": "ladder"
         },
         {
             "x": 1050,
-            "y": 550,
+            "y": 500,
             "width" : 50,
-            "height" : 50,
+            "height" : 100,
             "type": "ladder"
         },
         {
@@ -376,6 +376,62 @@
             "y": 690,
             "width" : 50,
             "height" : 50,
+            "type": "ladder"
+        },
+        {
+            "x": 1275,
+            "y": 760,
+            "width" : 50,
+            "height" : 160,
+            "type": "ladder"
+        },
+        {
+            "x": 750,
+            "y": 730,
+            "width" : 50,
+            "height" : 220,
+            "type": "ladder"
+        },
+        {
+            "x": 525,
+            "y": 710,
+            "width" : 50,
+            "height" : 70,
+            "type": "ladder"
+        },
+        {
+            "x": 525,
+            "y": 880,
+            "width" : 50,
+            "height" : 90,
+            "type": "ladder"
+        },
+        {
+            "x": 350,
+            "y": 980,
+            "width" : 50,
+            "height" : 160,
+            "type": "ladder"
+        },
+        {
+            "x": 875,
+            "y": 950,
+            "width" : 50,
+            "height" : 220,
+            "type": "ladder"
+        },
+        {
+            "x": 1275,
+            "y": 1200,
+            "width" : 50,
+            "height" : 160,
+            "type": "ladder"
+        },
+        {
+            "x": 700,
+            "y": 1160,
+            "width" : 50,
+            "height" : 240,
             "type": "ladder"
         }
     ]
