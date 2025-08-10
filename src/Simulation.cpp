@@ -41,12 +41,12 @@ void Simulation::nextStep(){
                     if(obs->getType() == "platform")
                         brl->groundContact |= brl->checkCollision(obs);
                     else if (obs->getType() == "ladder"){
-                        if (brl->checkCollision(obs)){
+                        if (brl->checkCollision(obs))
                            brl->moveOnLadder(obs);
-                        }
                     }
                 }
             }
+
             brl->move(brl->chooseMoveDirection());
             brl->gravity();
         }
@@ -64,6 +64,8 @@ void Simulation::nextStep(){
     jm->stairsContact = false;
     for(const auto& entity :this->_entities)
         entity.get()->resetFlags();
+
+    this->removeBarrels();
 }
 
 string Simulation::keyboardControl(){
@@ -111,8 +113,18 @@ void Simulation::addBarrel(){
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> dist(0,50);
-    if(dist(gen) == 1 && counter < 1){
+    if(dist(gen) == 1 && counter < 3){
         _entities.push_back(make_unique<Barrel>(100,100,35));
         counter ++;
     }
+}
+void Simulation::removeBarrels(){
+   for(int idx = this->_entities.size() - 1; idx > 0; idx--){
+        if(Barrel *brl = dynamic_cast<Barrel*>(this->_entities[idx].get())){
+            if(brl->isOutsideMap(this->_windowX,this->_windowY))
+                this->_entities.erase(this->_entities.begin() + idx);
+        }
+        else
+            break;
+   }
 }

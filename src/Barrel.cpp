@@ -55,28 +55,26 @@ bool Barrel::checkCollision(Entity *entity){
     return false; //No hit
 }
 string Barrel::chooseMoveDirection(){
-    static int flag = 0;
-    static string direction = "Right";
 
     if(this->_goingDown)
-        direction = "Down";
+        this->_direction = "Down";
     else if (this->groundContact){
-        direction = (this->currentDirection == 1) ? "Right" : "Left";
-        if (flag){
+        this->_direction = (this->currentDirection == 1) ? "Right" : "Left";
+        if (this->_flag){
             if (this->_dy - this->_prevY > 20){
                 this->currentDirection *= -1;
-                direction = (this->currentDirection == 1) ? "Right" : "Left";
+                this->_direction = (this->currentDirection == 1) ? "Right" : "Left";
             }
-            flag = 0;
+            this->_flag = 0;
         }
         this->_prevY = this->_dy;
     }
     else{
-        flag = 1;  
-        direction = "";
+        this->_flag = 1;  
+        this->_direction = "";
     }
     
-    return direction;
+    return this->_direction;
 }
 void Barrel::moveOnLadder(Entity *entity){  
     random_device rd; 
@@ -100,4 +98,9 @@ void Barrel::resetFlags(){
     this->ladderContact = false;
     this->groundContact = false;
     this->_climbingDown = false;
+}
+bool Barrel::isOutsideMap(unsigned int mapX, unsigned int mapY){
+    if(0 <= this->_dx && this->_dx <= mapX && 0 <= this->_dy && this->_dy <= mapY)
+        return false;
+    return true;
 }
