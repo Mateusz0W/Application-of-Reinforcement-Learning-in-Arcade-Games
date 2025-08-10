@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <utility>
 #include <cmath>
+#include <random>
 
 using namespace std;
 using Vector2D = pair<float, float>;
@@ -9,7 +10,7 @@ using Vector2D = pair<float, float>;
 void Barrel::draw(sf::RenderWindow& window){
     sf::CircleShape circle(this->_radius);
     circle.setFillColor(sf::Color::Red);
-    circle.setPosition(sf::Vector2f(this->_dx,this->_dy));
+    circle.setPosition(sf::Vector2f(this->_dx - this->_radius, this->_dy - this->_radius));
     window.draw(circle);
 }
 void Barrel::move(string direction){
@@ -55,14 +56,16 @@ bool Barrel::checkCollision(Entity *entity){
 }
 string Barrel::chooseMoveDirection(){
     static int flag = 0;
-    static int currentDirection = 1;
     static string direction = "Right";
-    if (this->groundContact){
-        direction = (currentDirection == 1) ? "Right" : "Left";
+
+    if(this->_goingDown)
+        direction = "Down";
+    else if (this->groundContact){
+        direction = (this->currentDirection == 1) ? "Right" : "Left";
         if (flag){
             if (this->_dy - this->_prevY > 20){
-                currentDirection *= -1;
-                direction = (currentDirection == 1) ? "Right" : "Left";
+                this->currentDirection *= -1;
+                direction = (this->currentDirection == 1) ? "Right" : "Left";
             }
             flag = 0;
         }
@@ -74,4 +77,27 @@ string Barrel::chooseMoveDirection(){
     }
     
     return direction;
+}
+void Barrel::moveOnLadder(Entity *entity){  
+    random_device rd; 
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist(0,1);
+
+    float ladderTop = entity->getY();
+    float ladderCenterX = entity->getX() + entity->getWidth() / 2;
+    float prevState = this->_goingDown;
+   
+    if(this->_dy < ladderTop && this->_dx == ladderCenterX && dist(gen))
+        this->_goingDown = true;
+    if(!this->_prevGroundContact && this->groundContact)
+        this->_goingDown = false;
+    if(prevState && !this->_goingDown)
+        this->currentDirection *= -1;
+
+    this->_prevGroundContact = this->groundContact;
+}
+void Barrel::resetFlags(){
+    this->ladderContact = false;
+    this->groundContact = false;
+    this->_climbingDown = false;
 }

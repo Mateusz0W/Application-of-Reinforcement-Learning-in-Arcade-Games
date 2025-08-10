@@ -37,7 +37,15 @@ void Simulation::nextStep(){
             for(int i=1;i<_entities.size();i++){
                 if(dynamic_cast<Barrel*>(_entities[i].get()))
                     break;
-                brl->groundContact |= brl->checkCollision(_entities[i].get());
+                else if (Obstacle *obs = dynamic_cast<Obstacle*>(_entities[i].get())){
+                    if(obs->getType() == "platform")
+                        brl->groundContact |= brl->checkCollision(obs);
+                    else if (obs->getType() == "ladder"){
+                        if (brl->checkCollision(obs)){
+                           brl->moveOnLadder(obs);
+                        }
+                    }
+                }
             }
             brl->move(brl->chooseMoveDirection());
             brl->gravity();
@@ -104,7 +112,7 @@ void Simulation::addBarrel(){
     mt19937 gen(rd());
     uniform_int_distribution<> dist(0,50);
     if(dist(gen) == 1 && counter < 1){
-        _entities.push_back(make_unique<Barrel>(100,245,35));
+        _entities.push_back(make_unique<Barrel>(100,100,35));
         counter ++;
     }
 }
