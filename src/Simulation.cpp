@@ -109,13 +109,15 @@ void Simulation::loadMapFromJson(string fileName){
 }
 
 void Simulation::addBarrel(){
-    static int counter = 0;
+    static chrono::seconds timeBetweenBarrels{0};
     random_device rd;
     mt19937 gen(rd());
-    uniform_int_distribution<> dist(0,50);
-    if(dist(gen) == 1 && counter < 3){
-        _entities.push_back(make_unique<Barrel>(100,100,35));
-        counter ++;
+    uniform_int_distribution<> dist(2,6);
+    auto currentTime = std::chrono::steady_clock::now();
+    if(currentTime - this->_lastUpdate >= timeBetweenBarrels){
+        this->_entities.push_back(make_unique<Barrel>(100,245,35));
+        timeBetweenBarrels = chrono::seconds(dist(gen));
+        this->_lastUpdate = std::chrono::steady_clock::now();
     }
 }
 void Simulation::removeBarrels(){

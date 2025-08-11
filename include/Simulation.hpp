@@ -4,14 +4,18 @@
 #include <string>
 #include <memory>
 #include "Jumpman.hpp"
+#include <chrono>
 
 class Simulation{
     private:
         std::vector<std::unique_ptr<Entity>> _entities;
+        std::chrono::steady_clock::time_point _lastUpdate;
     public:
         unsigned int _windowX, _windowY;
         Simulation() = delete;
-        Simulation(std::vector<std::unique_ptr<Entity>>&& entities,unsigned int windowX, unsigned int windowY):_entities(std::move(entities)), _windowX(windowX), _windowY(windowY){}
+        Simulation(std::vector<std::unique_ptr<Entity>>&& entities,unsigned int windowX, unsigned int windowY):_entities(std::move(entities)), _windowX(windowX), _windowY(windowY){
+            _lastUpdate = std::chrono::steady_clock::now();
+        }
         void run();
         void nextStep();
         std::string keyboardControl();
