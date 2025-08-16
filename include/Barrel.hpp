@@ -11,7 +11,9 @@ class Barrel : public Entity{
         bool _flag;
     public:
         int currentDirection;
-        Barrel(float dx, float dy, float radius): Entity(dx,dy), _radius(radius), currentDirection(1),_goingDown(false),_prevGroundContact(true),_direction("Right"),_flag(false){}
+        Barrel(float dx, float dy, float radius): Entity(dx,dy), _radius(radius), currentDirection(1),_goingDown(false),_prevGroundContact(true),_direction("Right"),_flag(false){
+            this->setTexture("../assets/Barrel.png");
+        }
         void draw(sf::RenderWindow& window) override;
         void move(std::string direction) override;
         bool checkCollision(Entity *entity) override;

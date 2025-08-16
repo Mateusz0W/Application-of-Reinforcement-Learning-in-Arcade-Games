@@ -12,6 +12,7 @@ class Entity{
     protected:
         float _dx, _dy;
         float _width, _height; 
+        sf::Texture _texture;
     public:
         bool groundContact;
         bool ladderContact;
@@ -23,6 +24,7 @@ class Entity{
         virtual bool checkCollision(Entity *entity){return false;};
         virtual void gravity();
         virtual void resetFlags();
+        void setTexture(std::string path); 
         float getX();
         float getY();
         float getWidth();

@@ -5,7 +5,13 @@ class Obstacle: public Entity{
     private:
     std::string _type;
     public:
-        Obstacle(float x, float y, float width, float height,std::string type): Entity(x,y,width,height),_type(type){}
+        Obstacle(float x, float y, float width, float height,std::string type): Entity(x,y,width,height),_type(type){
+            if(type == "platform")
+                this->setTexture("../assets/Platform.png");
+            else
+                this->setTexture("../assets/Ladder.png");
+            _texture.setRepeated(true);
+        }
         void draw(sf::RenderWindow& window);
         std::string getType();
 

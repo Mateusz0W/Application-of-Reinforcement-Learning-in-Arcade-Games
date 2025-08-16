@@ -17,7 +17,7 @@ void Jumpman::move(string direction){
 
 void Jumpman::draw(sf::RenderWindow& window){
     sf::RectangleShape rectangle(sf::Vector2f(this->_width,this->_height));
-    rectangle.setFillColor(sf::Color::Green);
+    rectangle.setTexture(&_texture);
     rectangle.setPosition(sf::Vector2f(this->_dx,this->_dy));
     window.draw(rectangle); 
 }
@@ -55,7 +55,7 @@ void Jumpman::moveOnStairs(){
 void Jumpman::jump(){
     static int counter = 0;
     if (counter <100){
-        this->_dy-=3;
+        this->_dy-=2;
         this->jumping = true;
         counter ++;
     }

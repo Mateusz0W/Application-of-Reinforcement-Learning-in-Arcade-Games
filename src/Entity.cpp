@@ -1,4 +1,5 @@
 #include "Entity.hpp"
+#include <iostream>
 
 bool Entity::checkCollision(Entity *entity,CollisionBox box){
     return (
@@ -27,4 +28,10 @@ float Entity::getHeight(){
 void Entity::resetFlags(){
     this->ladderContact=false;
     this->groundContact=false;
+}
+void Entity::setTexture(std::string path){
+    if(!this->_texture.loadFromFile(path)){
+        std::cerr<<"Can't load texture";
+        return;
+    }
 }

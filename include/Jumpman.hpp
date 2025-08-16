@@ -9,7 +9,9 @@ class Jumpman: public Entity{
     public:
         bool jumping;
         bool stairsContact;
-        Jumpman():Entity(0,0,100,100),_keyboard(false),_rendering(false),jumping(false),stairsContact(false){}        
+        Jumpman():Entity(0,0,50,100),_keyboard(false),_rendering(false),jumping(false),stairsContact(false){
+            this->setTexture("../assets/Jumpman.png");
+        }        
         void move(std::string direction) override;
         void moveOnStairs();
         void draw(sf::RenderWindow& window);

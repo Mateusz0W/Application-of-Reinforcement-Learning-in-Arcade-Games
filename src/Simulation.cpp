@@ -11,9 +11,9 @@ using namespace std;
 using json = nlohmann::json;
 
 void Simulation::run(){
-    nextStep();
     addBarrel();
-
+    nextStep();
+    removeBarrels();
 }
 
 void Simulation::nextStep(){
@@ -52,8 +52,8 @@ void Simulation::nextStep(){
         }
     }
     string moveDirection = keyboardControl();
-    // first condition prevents from double jump. Second  condition prevents form stay in the air.
-    if ((moveDirection == "Jump" && !jm->groundContact) /*|| (moveDirection == "Up" && !groundContact)*/)
+    // first condition prevents from double jump. Second condition prevents form stay in the air.
+    if ((moveDirection == "Jump" && !jm->groundContact ) || (moveDirection == "Up" && !jm->groundContact && !jm->ladderContact))
         moveDirection = "";
     jm->move(moveDirection);
     jm->moveOnStairs();
@@ -64,8 +64,6 @@ void Simulation::nextStep(){
     jm->stairsContact = false;
     for(const auto& entity :this->_entities)
         entity.get()->resetFlags();
-
-    this->removeBarrels();
 }
 
 string Simulation::keyboardControl(){
@@ -118,15 +116,21 @@ void Simulation::addBarrel(){
         this->_entities.push_back(make_unique<Barrel>(100,245,35));
         timeBetweenBarrels = chrono::seconds(dist(gen));
         this->_lastUpdate = std::chrono::steady_clock::now();
+        this->_barrelsCounter++;
     }
 }
 void Simulation::removeBarrels(){
    for(int idx = this->_entities.size() - 1; idx > 0; idx--){
         if(Barrel *brl = dynamic_cast<Barrel*>(this->_entities[idx].get())){
-            if(brl->isOutsideMap(this->_windowX,this->_windowY))
+            if(brl->isOutsideMap(this->_windowX,this->_windowY)){
                 this->_entities.erase(this->_entities.begin() + idx);
+                this->_barrelsCounter--;
+            }
         }
         else
             break;
    }
+}
+int Simulation::getBarrelsCounter(){
+    return _barrelsCounter;
 }

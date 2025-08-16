@@ -9,7 +9,7 @@ using Vector2D = pair<float, float>;
 
 void Barrel::draw(sf::RenderWindow& window){
     sf::CircleShape circle(this->_radius);
-    circle.setFillColor(sf::Color::Red);
+    circle.setTexture(&_texture);
     circle.setPosition(sf::Vector2f(this->_dx - this->_radius, this->_dy - this->_radius));
     window.draw(circle);
 }
