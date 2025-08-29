@@ -64,3 +64,10 @@ void Jumpman::jump(){
         this->jumping = false;
     }
 }
+void Jumpman::restart(){
+    this->resetFlags();
+    this->stairsContact = false;
+    this->jumping = false;
+    this->_dx = 0;
+    this->_dy = 0;
+}

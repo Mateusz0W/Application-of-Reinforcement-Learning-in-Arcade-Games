@@ -14,6 +14,7 @@ void Simulation::run(){
     addBarrel();
     nextStep();
     removeBarrels();
+    restart();
 }
 
 void Simulation::nextStep(){
@@ -33,6 +34,7 @@ void Simulation::nextStep(){
         else if(Barrel *brl = dynamic_cast<Barrel*>(entity.get())){
             if(brl->checkCollision(jm)){
                 // TODO: implement end game logic
+                _reset = true;
             }
             for(int i=1;i<_entities.size();i++){
                 if(dynamic_cast<Barrel*>(_entities[i].get()))
@@ -119,10 +121,10 @@ void Simulation::addBarrel(){
         this->_barrelsCounter++;
     }
 }
-void Simulation::removeBarrels(){
+void Simulation::removeBarrels(bool removeAll){
    for(int idx = this->_entities.size() - 1; idx > 0; idx--){
         if(Barrel *brl = dynamic_cast<Barrel*>(this->_entities[idx].get())){
-            if(brl->isOutsideMap(this->_windowX,this->_windowY)){
+            if(brl->isOutsideMap(this->_windowX,this->_windowY) || removeAll){
                 this->_entities.erase(this->_entities.begin() + idx);
                 this->_barrelsCounter--;
             }
@@ -133,4 +135,12 @@ void Simulation::removeBarrels(){
 }
 int Simulation::getBarrelsCounter(){
     return _barrelsCounter;
+}
+void Simulation::restart(){
+    if(_reset){
+        removeBarrels(true);
+        auto *jm = dynamic_cast<Jumpman*>(_entities[0].get());
+        jm->restart();
+        _reset = false;
+    }
 }
