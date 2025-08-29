@@ -3,10 +3,9 @@
 using namespace std;
 
 int main(void){
-    vector<unique_ptr<Entity>> entities;
-    entities.push_back(make_unique<Jumpman>());
-    Simulation simulation(std::move(entities),1500,1700);
-    simulation.loadMapFromJson("../map.json");
+    Jumpman jumpman;
+    Simulation simulation(&jumpman,1500,1700);
+    simulation.loadMapFromJson(string(PROJECTPATH)+"/map.json");
     Renderer renderer(simulation,1500,1700);
 
     //simulation.run();
