@@ -12,7 +12,7 @@ class Barrel : public Entity{
     public:
         int currentDirection;
         Barrel(float dx, float dy, float radius): Entity(dx,dy), _radius(radius), currentDirection(1),_goingDown(false),_prevGroundContact(true),_direction("Right"),_flag(false){
-            this->setTexture("../assets/Barrel.png");
+            this->setTexture(std::string(PROJECTPATH)+"/assets/Barrel.png");
         }
         void draw(sf::RenderWindow& window) override;
         void move(std::string direction) override;

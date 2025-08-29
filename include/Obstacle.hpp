@@ -7,9 +7,9 @@ class Obstacle: public Entity{
     public:
         Obstacle(float x, float y, float width, float height,std::string type): Entity(x,y,width,height),_type(type){
             if(type == "platform")
-                this->setTexture("../assets/Platform.png");
+                this->setTexture(std::string(PROJECTPATH)+"/assets/Platform.png");
             else
-                this->setTexture("../assets/Ladder.png");
+                this->setTexture(std::string(PROJECTPATH)+"/assets/Ladder.png");
             _texture.setRepeated(true);
         }
         void draw(sf::RenderWindow& window);
