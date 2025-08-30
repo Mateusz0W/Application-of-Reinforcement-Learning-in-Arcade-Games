@@ -49,7 +49,7 @@ CollisionBox Jumpman::getCollisionBox(string box){
     throw invalid_argument("Unknown collision box: " + box);
 }
 void Jumpman::moveOnStairs(){
-    if (stairsContact && groundContact && !ladderContact) 
+    if (stairsContact && !ladderContact) 
         this->_dy -= 11;
 }
 void Jumpman::jump(){
