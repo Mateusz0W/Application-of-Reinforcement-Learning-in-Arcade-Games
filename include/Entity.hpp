@@ -13,11 +13,12 @@ class Entity{
         float _dx, _dy;
         float _width, _height; 
         sf::Texture _texture;
+        float _Vy;
     public:
         bool groundContact;
         bool ladderContact;
         Entity(float dx, float dy): _dx(dx), _dy(dy){}
-        Entity(float dx, float dy, float width, float height) : _dx(dx), _dy(dy), _width(width), _height(height), groundContact(false), ladderContact(false){} 
+        Entity(float dx, float dy, float width, float height) : _dx(dx), _dy(dy), _width(width), _height(height), groundContact(false), ladderContact(false), _Vy(0){} 
         virtual void move(std::string direction){}
         virtual void draw(sf::RenderWindow& window) =0;
         virtual bool checkCollision(Entity *entity,CollisionBox box);
