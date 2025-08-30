@@ -14,6 +14,7 @@ endif()
 set(PROJECT_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
 set(PROJECT_INC_DIR ${PROJECT_SOURCE_DIR}/include)
 
+
 # Output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -22,7 +23,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Build type and compiler flags
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall")
 set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall")
 
@@ -77,7 +78,7 @@ target_link_libraries(DonkeyKongLib PUBLIC
 )
 
 # Main executable
-add_executable(DonkeyKong Main.cpp)
+add_executable(DonkeyKong main.cpp)
 target_link_libraries(DonkeyKong PRIVATE DonkeyKongLib)
 
 # Python module
