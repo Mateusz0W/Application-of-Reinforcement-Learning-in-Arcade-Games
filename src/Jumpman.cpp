@@ -46,21 +46,25 @@ CollisionBox Jumpman::getCollisionBox(string box){
             this->_dy + 20                      //yMin
         );
     }
-    throw std::invalid_argument("Unknown collision box: " + box);
+    throw invalid_argument("Unknown collision box: " + box);
 }
 void Jumpman::moveOnStairs(){
-    if (stairsContact)
+    if (stairsContact && groundContact && !ladderContact) 
         this->_dy -= 11;
 }
 void Jumpman::jump(){
     static int counter = 0;
+    static float Vy = 1.5;
     if (counter <100){
-        this->_dy-=2;
+        Vy -= 0.1;
+        if (Vy < 0) Vy = 0;
+        this->_dy-=2.1 -Vy;
         this->jumping = true;
         counter ++;
     }
     else{
         counter = 0;
+        Vy = 1.5;
         this->jumping = false;
     }
 }
@@ -70,4 +74,13 @@ void Jumpman::restart(){
     this->jumping = false;
     this->_dx = 0;
     this->_dy = 0;
+}
+void Jumpman::gravity(){
+        if (!groundContact){
+        _Vy += 0.05;
+        if (_Vy >= 1) _Vy = 1;
+        this->_dy += _Vy;
+    }
+    else
+        _Vy = 0;
 }
