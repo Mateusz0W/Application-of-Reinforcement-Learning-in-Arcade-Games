@@ -15,11 +15,11 @@ void Barrel::draw(sf::RenderWindow& window){
 }
 void Barrel::move(string direction){
     if (direction == "Left")
-        this->_dx -= 1.;
+        this->_dx -= 1.5;
     else if (direction == "Right")
-        this->_dx += 1.;
+        this->_dx += 1.5;
     else if (direction == "Down")
-        this->_dy +=1.;
+        this->_dy += 1.5;
 }
 bool Barrel::checkCollision(Entity *entity){
     auto clamp = [](float value, float minValue, float maxValue){
