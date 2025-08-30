@@ -33,7 +33,6 @@ void Simulation::nextStep(){
         }
         else if(Barrel *brl = dynamic_cast<Barrel*>(entity.get())){
             if(brl->checkCollision(jm)){
-                // TODO: implement end game logic
                 _reset = true;
             }
             for(int i=1;i<_entities.size();i++){
@@ -115,7 +114,7 @@ void Simulation::addBarrel(){
     uniform_int_distribution<> dist(2,6);
     auto currentTime = std::chrono::steady_clock::now();
     if(currentTime - this->_lastUpdate >= timeBetweenBarrels){
-        this->_entities.push_back(make_unique<Barrel>(100,245,35));
+        this->_entities.push_back(make_unique<Barrel>(100,245,32));
         timeBetweenBarrels = chrono::seconds(dist(gen));
         this->_lastUpdate = std::chrono::steady_clock::now();
         this->_barrelsCounter++;
