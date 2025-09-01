@@ -9,7 +9,8 @@ namespace py = pybind11;
 PYBIND11_MODULE(DonkeyKongPy, m){
     py::class_<Renderer>(m, "Renderer")
         .def(py::init<Simulation&, unsigned int, unsigned int>())
-        .def("run", &Renderer::run);
+        .def("run", &Renderer::run)
+        .def("isOpen", &Renderer::isOpen);
     
     py::class_<Simulation>(m, "Simulation")
         .def(py::init<Jumpman*, unsigned int, unsigned int>())
@@ -17,7 +18,8 @@ PYBIND11_MODULE(DonkeyKongPy, m){
         .def("getBarrelsPositions", &Simulation::getBarrelsPositions)
         .def("getJumpmanPosition", &Simulation::getJumpmanPosition)
         .def("getReset", &Simulation::getReset)
-        .def("getWin", &Simulation::getWin);
+        .def("getWin", &Simulation::getWin)
+        .def("run", &Simulation::run);
 
     py::class_<Jumpman>(m, "Jumpman")
         .def(py::init<>());
