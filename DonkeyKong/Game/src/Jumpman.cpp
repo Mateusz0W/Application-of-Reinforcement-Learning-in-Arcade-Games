@@ -73,7 +73,7 @@ void Jumpman::restart(){
     this->stairsContact = false;
     this->jumping = false;
     this->_dx = 0;
-    this->_dy = 0;
+    this->_dy = 140;
 }
 void Jumpman::gravity(){
         if (!groundContact){
@@ -83,4 +83,11 @@ void Jumpman::gravity(){
     }
     else
         _Vy = 0;
+}
+
+bool Jumpman::reachPrincess(){
+    if(_dy <= 70)
+        return true;
+    else
+        return false;
 }
