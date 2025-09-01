@@ -5,20 +5,25 @@
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <random>
-
+#include <cmath>
+#include <algorithm>
 
 using namespace std;
 using json = nlohmann::json;
 
 void Simulation::run(){
+    _reset = false;
+    _win = false;
     addBarrel();
     nextStep();
     removeBarrels();
     restart();
+    _barrelsPositions.clear();
 }
 
 void Simulation::nextStep(){
     Jumpman* jm = dynamic_cast<Jumpman*>(_entities[0].get());
+    _jumpmanPosition = make_tuple(jm->getX(),jm->getY());
     for (const auto& entity :this->_entities){
         if(jm == entity.get())
             continue;
@@ -50,8 +55,10 @@ void Simulation::nextStep(){
 
             brl->move(brl->chooseMoveDirection());
             brl->gravity();
+            _barrelsPositions.push_back(make_tuple(brl->getX(),brl->getY()));
         }
     }
+    //string moveDirection = action;
     string moveDirection = keyboardControl();
     // first condition prevents from double jump. Second condition prevents form stay in the air.
     if ((moveDirection == "Jump" && !jm->groundContact ) || (moveDirection == "Up" && !jm->groundContact && !jm->ladderContact))
@@ -62,6 +69,10 @@ void Simulation::nextStep(){
         jm->gravity();
 
     // TODO: Implement flag reset
+    if(jm->isOutsideMap(this->_windowX,this->_windowY))
+        _reset = true;
+    if(jm->reachPrincess())
+        _win = true;
     jm->stairsContact = false;
     for(const auto& entity :this->_entities)
         entity.get()->resetFlags();
@@ -136,10 +147,45 @@ int Simulation::getBarrelsCounter(){
     return _barrelsCounter;
 }
 void Simulation::restart(){
-    if(_reset){
+    if(_reset || _win){
         removeBarrels(true);
         auto *jm = dynamic_cast<Jumpman*>(_entities[0].get());
         jm->restart();
-        _reset = false;
     }
+}
+vector<tuple<float,float>> Simulation::getBarrelsPositions(){
+    // returns 5 closest barrels to jumpman
+
+    Jumpman* jm = dynamic_cast<Jumpman*>(_entities[0].get());
+    float jmX = jm->getX();
+    float jmY = jm->getY();
+
+    auto distanceToJumpman = [jmX, jmY](const float x, const float y){ 
+        return pow(jmX - x,2) + pow(jmY - y, 2);
+    };
+
+    sort(_barrelsPositions.begin(),_barrelsPositions.end(),
+    [distanceToJumpman](const tuple<float,float> &a, const tuple<float,float> &b){
+        auto dist1 = distanceToJumpman(get<0>(a),get<1>(a));
+        auto dist2 = distanceToJumpman(get<0>(b),get<1>(b));
+        return dist1 < dist2;
+    });
+
+    vector<tuple<float,float>> closest;
+    int size = _barrelsPositions.size();
+    float inf = INFINITY;
+
+    if(size < 5){
+        closest.assign(_barrelsPositions.begin(),_barrelsPositions.begin() + size);
+        for(int i = size; i < 5; i++)
+            closest[i] = make_tuple(inf,inf);
+    }
+    else
+        closest.assign(_barrelsPositions.begin(),_barrelsPositions.begin() + 5);
+
+    return closest;
+    
+}
+tuple<float,float> Simulation::getJumpmanPosition(){
+    return _jumpmanPosition;
 }
