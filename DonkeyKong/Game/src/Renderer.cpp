@@ -14,16 +14,17 @@ void Renderer::drawFrame(sf::RenderWindow& window){
         entities[i]->draw(window);
 }
 void Renderer::run(){
-    sf::RenderWindow window(sf::VideoMode({_windowWidth,_windowHeight}),"Donkey Kong");
-    while (window.isOpen()) {
-        while (const std::optional event = window.pollEvent())
-        {
-            if (event->is<sf::Event::Closed>())
-                window.close();
+    while (const std::optional event = _window.pollEvent()) {
+        if (event->is<sf::Event::Closed>()) {
+            _window.close();
+            return; 
         }
-        this->_simulation.run();
-        window.clear(sf::Color::Black);
-        this->drawFrame(window);
-        window.display();
     }
+
+    _window.clear(sf::Color::Black);
+    this->drawFrame(_window);
+    _window.display();
+}
+bool Renderer::isOpen() const {
+    return _window.isOpen();
 }
