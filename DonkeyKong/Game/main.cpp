@@ -8,6 +8,11 @@ int main(void){
     simulation.loadMapFromJson(string(PROJECTPATH)+"/map.json");
     Renderer renderer(simulation,1700,1500);
 
-    //simulation.run();
-    renderer.run();
+    while (renderer.isOpen())
+    {
+        simulation.run();
+        renderer.run();
+    }
+    
+
 }

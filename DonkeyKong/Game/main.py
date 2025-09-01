@@ -3,4 +3,6 @@ jm = DK.Jumpman()
 sim = DK.Simulation(jm,1700,1500)
 sim.loadMapFromJson("map.json")
 renderer = DK.Renderer(sim,1700,1500)
-renderer.run()
+while renderer.isOpen():
+    sim.run()
+    renderer.run()
