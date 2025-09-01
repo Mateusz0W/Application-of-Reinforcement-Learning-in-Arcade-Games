@@ -9,7 +9,7 @@ class Renderer{
         unsigned int _windowWidth;
     public:
         Renderer() = delete;
-        Renderer(Simulation &simulation,unsigned int windowHeight,unsigned int windowWidth):_simulation(simulation),_windowHeight(windowHeight),_windowWidth(windowWidth){}
+        Renderer(Simulation &simulation,unsigned int windowWidth,unsigned int windowHeight):_simulation(simulation),_windowHeight(windowHeight),_windowWidth(windowWidth){}
         void drawFrame(sf::RenderWindow& window);
         void run();
 };
