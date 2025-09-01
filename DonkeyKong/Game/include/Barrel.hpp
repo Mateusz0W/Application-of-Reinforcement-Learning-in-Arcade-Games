@@ -19,6 +19,5 @@ class Barrel : public Entity{
         bool checkCollision(Entity *entity) override;
         std::string chooseMoveDirection();
         void moveOnLadder(Entity *entity);
-        bool isOutsideMap(unsigned int mapX, unsigned int mapY);
         void resetFlags() override;
 };

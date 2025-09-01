@@ -35,3 +35,8 @@ void Entity::setTexture(std::string path){
         return;
     }
 }
+bool Entity::isOutsideMap(unsigned int mapX, unsigned int mapY){
+    if(0 <= this->_dx && this->_dx <= mapX && 0 <= this->_dy && this->_dy <= mapY)
+        return false;
+    return true;
+}

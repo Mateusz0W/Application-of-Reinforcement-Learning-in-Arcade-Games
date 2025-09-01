@@ -25,6 +25,7 @@ class Entity{
         virtual bool checkCollision(Entity *entity){return false;};
         virtual void gravity();
         virtual void resetFlags();
+        virtual bool isOutsideMap(unsigned int mapX, unsigned int mapY);
         void setTexture(std::string path); 
         float getX();
         float getY();
