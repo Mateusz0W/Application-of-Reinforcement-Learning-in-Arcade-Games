@@ -11,14 +11,17 @@
 using namespace std;
 using json = nlohmann::json;
 
-void Simulation::run(){
+int Simulation::run(){
     _reset = false;
     _win = false;
     addBarrel();
     nextStep();
     removeBarrels();
-    restart();
+    if (_playerMode)
+        restart();
     _barrelsPositions.clear();
+
+    return _win | _reset;
 }
 
 void Simulation::nextStep(){
@@ -59,7 +62,7 @@ void Simulation::nextStep(){
         }
     }
     //string moveDirection = action;
-    string moveDirection = keyboardControl();
+    string moveDirection = _playerMode ? keyboardControl() : this->action;
     // first condition prevents from double jump. Second condition prevents form stay in the air.
     if ((moveDirection == "Jump" && !jm->groundContact ) || (moveDirection == "Up" && !jm->groundContact && !jm->ladderContact))
         moveDirection = "";
@@ -177,8 +180,7 @@ vector<tuple<float,float>> Simulation::getBarrelsPositions(){
 
     if(size < 5){
         closest.assign(_barrelsPositions.begin(),_barrelsPositions.begin() + size);
-        for(int i = size; i < 5; i++)
-            closest[i] = make_tuple(inf,inf);
+        closest.resize(5, make_tuple(inf, inf));
     }
     else
         closest.assign(_barrelsPositions.begin(),_barrelsPositions.begin() + 5);

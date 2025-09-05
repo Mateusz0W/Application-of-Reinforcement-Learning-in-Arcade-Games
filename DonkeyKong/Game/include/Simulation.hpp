@@ -16,14 +16,16 @@ class Simulation{
         int _barrelsCounter;
         bool _reset;
         bool _win;
+        bool _playerMode;
     public:
+        std::string action;
         unsigned int _windowX, _windowY;
         Simulation() = delete;
-        Simulation(Jumpman *jm, unsigned int windowX, unsigned int windowY): _windowX(windowX), _windowY(windowY), _barrelsCounter(0), _reset(false), _win(false){
+        Simulation(Jumpman *jm, unsigned int windowX, unsigned int windowY, bool playerMode): _windowX(windowX), _windowY(windowY), _barrelsCounter(0), _reset(false), _win(false), _playerMode(playerMode){
             _entities.push_back(std::unique_ptr<Jumpman>(jm));
             _lastUpdate = std::chrono::steady_clock::now();
         }
-        void run();
+        int run();
         void nextStep();
         std::string keyboardControl();
         const std::vector<std::unique_ptr<Entity>>& getEntities() const ;
