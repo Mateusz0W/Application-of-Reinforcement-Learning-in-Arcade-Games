@@ -431,7 +431,14 @@
             "x": 700,
             "y": 1160,
             "width" : 50,
-            "height" : 240,
+            "height" : 100,
+            "type": "ladder"
+        },
+        {
+            "x": 700,
+            "y": 1320,
+            "width" : 50,
+            "height" : 80,
             "type": "ladder"
         }
     ]
