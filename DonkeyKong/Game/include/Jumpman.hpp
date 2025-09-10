@@ -6,7 +6,7 @@ class Jumpman: public Entity{
     public:
         bool jumping;
         bool stairsContact;
-        Jumpman():Entity(0,140,60,85),jumping(false),stairsContact(false){
+        Jumpman():Entity(50,1315,60,85),jumping(false),stairsContact(false){
             this->setTexture(std::string(PROJECTPATH)+"/assets/Jumpman.png");
         }        
         void move(std::string direction) override;

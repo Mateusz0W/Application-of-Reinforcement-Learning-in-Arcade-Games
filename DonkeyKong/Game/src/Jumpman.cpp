@@ -72,8 +72,8 @@ void Jumpman::restart(){
     this->resetFlags();
     this->stairsContact = false;
     this->jumping = false;
-    this->_dx = 0;
-    this->_dy = 140;
+    this->_dx = 50;
+    this->_dy = 1315;
 }
 void Jumpman::gravity(){
         if (!groundContact){
