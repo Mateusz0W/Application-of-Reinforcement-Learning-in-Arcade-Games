@@ -5,8 +5,11 @@
 class Jumpman: public Entity{
     public:
         bool jumping;
+        bool fallingAfterJump;
         bool stairsContact;
-        Jumpman():Entity(50,1315,60,85),jumping(false),stairsContact(false){
+        float jumpStrength;
+        float jumpStartY;
+        Jumpman():Entity(50,1315,60,85),jumping(false), fallingAfterJump(false), stairsContact(false), jumpStrength(-5.f){
             this->setTexture(std::string(PROJECTPATH)+"/assets/Jumpman.png");
         }        
         void move(std::string direction) override;
@@ -17,4 +20,5 @@ class Jumpman: public Entity{
         CollisionBox getCollisionBox(std::string box);
         void restart();
         bool reachPrincess();
+        bool isJumping();
 };

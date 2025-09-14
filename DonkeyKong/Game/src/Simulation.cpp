@@ -32,8 +32,11 @@ void Simulation::nextStep(){
             continue;
         else if(Obstacle *obs = dynamic_cast<Obstacle*>(entity.get())){
             if (obs->getType() == "platform"){
+                if (jm->isJumping())
+                    continue;
                 jm->groundContact |= jm->checkCollision(obs,jm->getCollisionBox("groundBox"));
                 jm->stairsContact |= jm->checkCollision(obs,jm->getCollisionBox("sideBox"));
+                if(jm->groundContact) jm->fallingAfterJump = false;
             }
             else if (obs->getType() == "ladder"){
                 jm->ladderContact |= jm->checkCollision(obs,jm->getCollisionBox("ladderBox"));
@@ -128,7 +131,7 @@ void Simulation::addBarrel(){
     uniform_int_distribution<> dist(2,6);
     auto currentTime = std::chrono::steady_clock::now();
     if(currentTime - this->_lastUpdate >= timeBetweenBarrels){
-        this->_entities.push_back(make_unique<Barrel>(100,245,32));
+        this->_entities.push_back(make_unique<Barrel>(100.f,245.f,32.f));
         timeBetweenBarrels = chrono::seconds(dist(gen));
         this->_lastUpdate = std::chrono::steady_clock::now();
         this->_barrelsCounter++;

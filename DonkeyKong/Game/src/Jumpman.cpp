@@ -5,13 +5,13 @@ using namespace std;
 void Jumpman::move(string direction){
     if (direction == "Left")
         this->_dx -= 1.;
-    else if (direction == "Right")
+    if (direction == "Right")
         this->_dx += 1.;
-    else if (direction == "Up")
+    if (direction == "Up")
         this->_dy -= 1.;
-    else if (direction == "Down")
+    if (direction == "Down")
         this->_dy +=1.;
-    else if (direction == "Jump" || this->jumping)
+    if (direction == "Jump" || this->jumping)
         this->jump();
 }
 
@@ -53,19 +53,18 @@ void Jumpman::moveOnStairs(){
         this->_dy -= 11;
 }
 void Jumpman::jump(){
-    static int counter = 0;
-    static float Vy = 1.5;
-    if (counter <100){
-        Vy -= 0.1;
-        if (Vy < 0) Vy = 0;
-        this->_dy-=2.1 -Vy;
-        this->jumping = true;
-        counter ++;
-    }
-    else{
-        counter = 0;
-        Vy = 1.5;
+    bool prevJumpingState = this->jumping;
+    this->jumping = true;
+
+    if(!prevJumpingState && this->jumping)
+        this->jumpStartY = this->_dy;
+
+    this->_dy += jumpStrength;
+    jumpStrength += 0.1f;
+    if (jumpStrength > 0){
         this->jumping = false;
+        this->fallingAfterJump = true;
+        jumpStrength = -5.f;
     }
 }
 void Jumpman::restart(){
@@ -74,11 +73,12 @@ void Jumpman::restart(){
     this->jumping = false;
     this->_dx = 50;
     this->_dy = 1315;
+    this->fallingAfterJump = false;
 }
 void Jumpman::gravity(){
-        if (!groundContact){
-        _Vy += 0.05;
-        if (_Vy >= 1) _Vy = 1;
+    if (!groundContact){
+        _Vy += 0.01;
+        if (_Vy >= 1.5) _Vy = 1.5;
         this->_dy += _Vy;
     }
     else
@@ -90,4 +90,13 @@ bool Jumpman::reachPrincess(){
         return true;
     else
         return false;
+}
+
+bool Jumpman::isJumping(){
+    if (jumpStartY - _dy < 5 && (fallingAfterJump || jumping))
+        return false;
+    else if (fallingAfterJump || jumping)
+        return true;
+
+    return false;
 }
