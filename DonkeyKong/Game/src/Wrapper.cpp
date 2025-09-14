@@ -25,5 +25,6 @@ PYBIND11_MODULE(DonkeyKongPy, m){
         .def_readwrite("action", &Simulation::action);
 
     py::class_<Jumpman>(m, "Jumpman")
-        .def(py::init<>());
+        .def(py::init<>())
+        .def_readwrite("jumping", &Jumpman::jumping);
 }
