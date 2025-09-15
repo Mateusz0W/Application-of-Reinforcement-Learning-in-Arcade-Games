@@ -50,7 +50,7 @@ CollisionBox Jumpman::getCollisionBox(string box){
 }
 void Jumpman::moveOnStairs(){
     if (stairsContact && !ladderContact) 
-        this->_dy -= 11;
+        this->_dy -= 10;
 }
 void Jumpman::jump(){
     bool prevJumpingState = this->jumping;
@@ -71,7 +71,7 @@ void Jumpman::restart(){
     this->resetFlags();
     this->stairsContact = false;
     this->jumping = false;
-    this->_dx = 50;
+    this->_dx = 300;
     this->_dy = 1315;
     this->fallingAfterJump = false;
 }
