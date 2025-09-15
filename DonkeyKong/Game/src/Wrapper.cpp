@@ -26,5 +26,7 @@ PYBIND11_MODULE(DonkeyKongPy, m){
 
     py::class_<Jumpman>(m, "Jumpman")
         .def(py::init<>())
-        .def_readwrite("jumping", &Jumpman::jumping);
+        .def_readwrite("jumping", &Jumpman::jumping)
+        .def_readwrite("ladderContact", &Jumpman::ladderContact)
+        .def_readwrite("fallingAfterJump", &Jumpman::fallingAfterJump);
 }
