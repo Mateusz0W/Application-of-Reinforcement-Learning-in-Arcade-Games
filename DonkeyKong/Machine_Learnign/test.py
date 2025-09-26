@@ -5,7 +5,9 @@ env = gym.make("DonkeyKong-v0",render_mode='human')
 obs, info = env.reset()
 
 done = False
+r = 0
 while True:
-    action = 4
+    action = env.action_space.sample()
     obs, reward, done, truncated, info = env.step(action)
-    print(f"Reward: {reward}")
+    r += reward
+    print(f"Reward: {r}")
