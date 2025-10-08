@@ -7,11 +7,23 @@ import ale_py
 import Wrappers
 from  tensorboardX import SummaryWriter
 import time
+import sys
 
 from Algorithms.dqn import DQN
+from Algorithms.double_dqn import DoubleDQN
+from Algorithms.prio_dqn import PrioDQN
+
 from Config.config import Hyperparameters as Hyp
+
 from Networks.conv import Conv
+from Networks.dueling import Dueling
+from Networks.noisy import Noisy
+
 from Memories.replay_memory import ReplayMemory
+from Memories.prio_replay_memory import PrioReplayMemory
+from Memories.n_step_replay_memory import NStepReplayMemory
+
+from plotter import Plotter
 
 device = torch.device(
     "cuda" if torch.cuda.is_available() else
@@ -21,15 +33,86 @@ device = torch.device(
 
 os.makedirs("models", exist_ok=True)
 
+metadata = {"DQNs": ["DQN","Double_DQN"]}
+
+def setup(alg, env, hyp: Hyp):
+
+    if alg == "DQN" or "Double_DQN":
+        net = Conv(env.observation_space.shape, env.action_space.n).to(device)
+        target_net = Conv(env.observation_space.shape, env.action_space.n).to(device)
+        dqn = DQN if "DQN" else DoubleDQN
+        buffer = ReplayMemory(hyp.REPLAY_SIZE)
+        agent = dqn(env, buffer)
+        optimizer = optim.Adam(net.parameters(), lr=hyp.LEARNING_RATE)
+        process_batch = process_batch_dqn
+
+    elif alg == "PrioDQN":
+        net = Conv(env.observation_space.shape, env.action_space.n).to(device)
+        target_net = Conv(env.observation_space.shape, env.action_space.n).to(device)
+        dqn = PrioDQN
+        buffer = PrioReplayMemory(hyp.REPLAY_SIZE)
+        agent = dqn(env, buffer)
+        optimizer = optim.Adam(net.parameters(), lr=hyp.LEARNING_RATE)
+        process_batch = process_batch_prio_dqn
+
+    elif alg == "DuelingDQN" or "NoisyDQN":
+        Network = Dueling if "DuelingDQN" else Noisy
+        net = Network(env.observation_space.shape, env.action_space.n).to(device)
+        target_net = Network(env.observation_space.shape, env.action_space.n).to(device)
+        dqn = DQN 
+        buffer = ReplayMemory(hyp.REPLAY_SIZE)
+        agent = dqn(env, buffer)
+        optimizer = optim.Adam(net.parameters(), lr=hyp.LEARNING_RATE)
+        process_batch = process_batch_dqn
+
+    elif alg == "NStepDQN":
+        n = sys.argv[2]
+        net = Conv(env.observation_space.shape, env.action_space.n).to(device)
+        target_net = Conv(env.observation_space.shape, env.action_space.n).to(device)
+        dqn = DQN 
+        buffer = NStepReplayMemory(hyp.REPLAY_SIZE, n)
+        agent = dqn(env, buffer)
+        optimizer = optim.Adam(net.parameters(), lr=hyp.LEARNING_RATE)
+        process_batch = process_batch_dqn
+         
+    return net, target_net, dqn, agent, optimizer, process_batch, buffer
+
+def process_batch_dqn(optimizer, buffer, dqn, batch_size, net, target_net, gamma, device, frame_idx):
+        if frame_idx % hyp.SYNC_TARGET_FRAMES == 0:
+            target_net.load_state_dict(net.state_dict())
+
+        optimizer.zero_grad()
+        batch = buffer.sample(batch_size)
+        loss_t = dqn.calc_loss(batch, net, target_net, gamma, device)
+        loss_t.backward()
+        optimizer.step()
+        return loss_t.item()
+
+def process_batch_prio_dqn(optimizer, buffer, dqn, batch_size, net, target_net, gamma, device, frame_idx):
+    batch, batch_indices, batch_weights = buffer.sample(batch_size)
+    optimizer.zero_grad()
+    loss_v, sample_prios = dqn.calc_loss(batch, batch_weights, net, target_net, gamma, device)
+    loss_v.backward()
+    optimizer.step()
+    buffer.update_priorities(batch_indices, sample_prios)
+
+    if frame_idx % hyp.SYNC_TARGET_FRAMES == 0:
+            target_net.load_state_dict(net.state_dict())
+    
+    buffer.update_beta(frame_idx)
+    
+    return loss_v
+
 
 if __name__ == "__main__":
+    assert sys.argv[1] in metadata["DQNs"], "Error: Wrong algortihm name"
+    assert sys.argv[1] == "NStepDQN" and len(sys.argv) != 3 and int(sys.argv[2]) < 0, "Error: Missing n argument or n must be non-negative"
+
     gym.register_envs(ale_py)
     env = Wrappers.make_env("ALE/MsPacman-v5")
-    net = Conv(env.observation_space.shape, env.action_space.n).to(device)
-    target_net = Conv(env.observation_space.shape, env.action_space.n).to(device)
     hyp = Hyp(
         MEAN_REWARD_BOUND = 2500,
-        GAMMA = 0.99,
+        GAMMA = 0.99 if sys.argv[1] != "NStepDQN" else 0.99 ** int(sys.argv[2]),
         BATCH_SIZE = 32,
         REPLAY_SIZE = 10_000,
         REPLAY_START_SIZE = 10_000,
@@ -39,26 +122,29 @@ if __name__ == "__main__":
         EPSILON_START = 1.0,
         EPSILON_FINAL = 0.01
     )
+    net, target_net, dqn, agent, optimizer, process_batch, buffer = setup(sys.argv[1], env, hyp)
     writer = SummaryWriter(comment="Donkey Kong")
-    buffer = ReplayMemory(hyp.REPLAY_SIZE)
-    agent = DQN(env, buffer)
     epsilon = hyp.EPSILON_START
-    optimizer = optim.Adam(net.parameters(), lr=hyp.LEARNING_RATE)
     total_rewards = []
     frame_idx = 0
     ts_frame = 0
     ts = time.time()
     best_mean_reward = None 
     print(f"device = {device}\nnetwork = {net}")
+    start_time = time.time()
+    loss = []
+    fps = []
+    steps = []
 
     while True:
         frame_idx += 1
-        epsilon = max(hyp.EPSILON_FINAL, hyp.EPSILON_START - frame_idx / hyp.EPSILON_DECAY_LAST_FRAME)
         epsilon = max(hyp.EPSILON_FINAL, hyp.EPSILON_START - frame_idx / hyp.EPSILON_DECAY_LAST_FRAME)
         reward = agent.play_step(net, epsilon, device=device)
         if reward is not None:
             total_rewards.append(reward)
             speed = (frame_idx - ts_frame) / (time.time() - ts)
+            fps.append(speed)
+            steps.append(frame_idx)
             ts_frame = frame_idx
             ts = time.time()
             mean_reward = np.mean(total_rewards[-100:])
@@ -83,11 +169,8 @@ if __name__ == "__main__":
         if len(buffer) < hyp.REPLAY_START_SIZE:
             continue
 
-        if frame_idx % hyp.SYNC_TARGET_FRAMES == 0:
-            target_net.load_state_dict(net.state_dict())
+        loss_t = process_batch(optimizer, buffer, dqn, hyp.BATCH_SIZE, net, target_net, hyp.GAMMA, device, frame_idx)
+        loss.append(loss_t)
 
-        optimizer.zero_grad()
-        batch = buffer.sample(hyp.BATCH_SIZE)
-        loss_t = DQN.calc_loss(batch, net, target_net, hyp.GAMMA, device)
-        loss_t.backward()
-        optimizer.step()
+    total_time = (time.time() - start_time) / 3600
+    Plotter.plot(total_rewards,steps,fps,str(sys.argv[1]))
