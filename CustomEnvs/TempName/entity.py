@@ -23,7 +23,6 @@ class Entity:
         down = abs((self.y + self.height) - other.y)
         up = abs(self.y - (other.y + other.height))
 
-
         collision_side =  min(right, left, up, down)
 
         if collision_side == right:
@@ -36,10 +35,6 @@ class Entity:
             return Direction.DOWN
         
     def check_collision(self, other) -> None:
-        if not self._check_box_collision(other):
-            self.collision = False 
-            self.collision_side = None
-            return
-        
-        self.collision = True
-        self.collision_side = self._check_side_of_collision(other)
+        if self._check_box_collision(other):     
+            self.collision = True
+            self.collision_side = self._check_side_of_collision(other)
