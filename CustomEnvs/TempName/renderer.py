@@ -27,5 +27,10 @@ class Renderer:
         for player in sim.players:
             player.draw(self.screen)
 
+        for obstacle in sim.obstacles:
+            obstacle.draw(self.screen)
+
+        
+
         
         
