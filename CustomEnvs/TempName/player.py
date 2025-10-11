@@ -1,23 +1,21 @@
 from config import Direction, GameConfig, Colors
 import pygame
+from entity import Entity
 
-class Player:
+class Player(Entity):
     def __init__(self,x: float, y: float, width: float, height: float, speed: float, color: Colors) -> None:
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
+        super().__init__(x, y, width, height)
         self.speed = speed
         self.color = color
 
     def update_position(self, direction: Direction) -> None:
-        if direction == Direction.RIGHT:
+        if direction == Direction.RIGHT and direction != self.collision_side:
             self.x += self.speed
-        elif direction == Direction.LEFT:
+        elif direction == Direction.LEFT and direction != self.collision_side:
             self.x -= self.speed
-        elif direction == Direction.UP:
+        elif direction == Direction.UP and direction != self.collision_side:
             self.y -= self.speed
-        elif direction == Direction.DOWN:
+        elif direction == Direction.DOWN and direction != self.collision_side:
             self.y += self.speed
 
         self.x = max(0, min(self.x, GameConfig.screen_width - self.width))
