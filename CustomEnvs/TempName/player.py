@@ -39,3 +39,7 @@ class Player(Entity):
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
 
+    def reset(self) -> None:
+        self.collision = False
+        self.collision_side = None
+
