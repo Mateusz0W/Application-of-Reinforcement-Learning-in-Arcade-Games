@@ -20,6 +20,7 @@ class Colors:
     Blue = (0, 0, 255)
     Black = (0, 0, 0)
     Green = (0, 255, 0)
+    Orange = (255, 165, 0)
 
 @dataclass(frozen=True)
 class ObstacleConfig:
@@ -28,4 +29,7 @@ class ObstacleConfig:
     max_height: int = 70
     min_height: int = 10
 
-
+@dataclass(frozen=True)
+class BulletConfig:
+    radius: int = 10
+    speed: int = 30
