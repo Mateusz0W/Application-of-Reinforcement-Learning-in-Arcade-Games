@@ -1,13 +1,14 @@
 from config import Direction
 
 class Entity:
-    def __init__(self, x: float, y: float, width: float, height: float):
+    def __init__(self, x: float, y: float, width: float, height: float, radius: float = None):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.collision = False
         self.collision_side = None
+        self.radius = radius
 
     def _check_box_collision(self, other: "Entity") -> bool:
         return (
@@ -34,7 +35,28 @@ class Entity:
         elif collision_side == down:
             return Direction.DOWN
         
-    def check_collision(self, other) -> None:
-        if self._check_box_collision(other):     
-            self.collision = True
-            self.collision_side = self._check_side_of_collision(other)
+    def _check_circle_collision(self, other: "Entity") -> bool:
+        clamp = lambda value, min_value, max_value: max(min_value, min(max_value, value))
+        
+        d_vector = (self.x + other.x + other.width / 2, self.y + other.y + other.height / 2)
+        aabb_half_extents = (other.width / 2, other.height / 2)
+        clamped_x = clamp(d_vector[0], -aabb_half_extents[0], aabb_half_extents[0])
+        clamped_y = clamp(d_vector[1], -aabb_half_extents[1], aabb_half_extents[1])
+        closest_point = (other.x + clamped_x, other.y +clamped_y)
+        new_d_vector = (closest_point.x - self.x, closest_point.y - self.y)
+
+        diff = (new_d_vector[0] **2 + new_d_vector[1] ** 2) ** 0.5
+
+        if diff <= self.radius:
+            return True
+        
+        return False
+
+    def check_collision(self, other: "Entity") -> None:
+        if self.radius is None:
+            if self._check_box_collision(other):     
+                self.collision = True
+                self.collision_side = self._check_side_of_collision(other)
+        else:
+            if self._check_circle_collision(other):
+                self.collision = True
