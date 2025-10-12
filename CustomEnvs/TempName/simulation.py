@@ -11,6 +11,7 @@ class Simulation:
             Player(500,750,20,20,5,Colors.Red)
         ]
         self.obstacles = self._set_obstacles()
+        self.bullets = []
 
     def run(self) -> None:
         self.update()
@@ -18,12 +19,14 @@ class Simulation:
 
     def update(self) -> None:
         direction = Player.keyboard_input()
+        self.players[1].check_collision(self.players[0])
+        for obstacle in self.obstacles:
+            self.players[1].check_collision(obstacle)
         if direction:
-            self.players[1].check_collision(self.players[0])
-            for obstacle in self.obstacles:
-                self.players[1].check_collision(obstacle)
-            #print(self.players[1].collision_side)
             self.players[1].update_position(direction)
+        self.bullets.append(self.players[1].shoot(90))
+        for bullet in self.bullets:
+            bullet.update_position()
 
     def _set_obstacles(self) -> list[Obstacle]:
         obstacles = []
