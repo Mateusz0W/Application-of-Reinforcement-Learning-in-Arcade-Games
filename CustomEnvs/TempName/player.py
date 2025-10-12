@@ -1,6 +1,7 @@
-from config import Direction, GameConfig, Colors
+from config import Direction, GameConfig, Colors, BulletConfig
 import pygame
 from entity import Entity
+from bullet import Bullet
 
 class Player(Entity):
     def __init__(self,x: float, y: float, width: float, height: float, speed: float, color: Colors) -> None:
@@ -42,4 +43,9 @@ class Player(Entity):
     def reset(self) -> None:
         self.collision = False
         self.collision_side = None
+
+    def shoot(self, angle) -> None:
+        bullet_x = self.x + self.width / 2
+        bullet_y = self.y + self.height / 2
+        return Bullet(bullet_x, bullet_y, BulletConfig.radius, Colors.Orange, BulletConfig.speed, angle)
 
