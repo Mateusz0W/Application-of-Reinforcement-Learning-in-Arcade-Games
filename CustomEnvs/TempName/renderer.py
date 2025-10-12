@@ -30,6 +30,9 @@ class Renderer:
         for obstacle in sim.obstacles:
             obstacle.draw(self.screen)
 
+        for bulet in sim.bullets:
+            bulet.draw(self.screen)
+
         
 
         
