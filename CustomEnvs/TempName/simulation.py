@@ -3,6 +3,7 @@ from config import Colors
 from obstacle import Obstacle
 from config import GameConfig, ObstacleConfig, Colors
 import random
+import pygame
 
 class Simulation:
     def __init__(self) -> None: 
@@ -18,15 +19,17 @@ class Simulation:
         self.reset()
 
     def update(self) -> None:
+        keys = pygame.key.get_pressed()
         direction = Player.keyboard_input()
         self.players[1].check_collision(self.players[0])
         for obstacle in self.obstacles:
             self.players[1].check_collision(obstacle)
         if direction:
             self.players[1].update_position(direction)
-        self.bullets.append(self.players[1].shoot(90))
+        if keys[pygame.K_SPACE]:
+            self.bullets.append(self.players[1].shoot(120))
         for bullet in self.bullets:
-            bullet.update_position()
+            bullet.update(self.players + self.obstacles)
 
     def _set_obstacles(self) -> list[Obstacle]:
         obstacles = []
@@ -42,6 +45,7 @@ class Simulation:
         return obstacles
     
     def reset(self) -> None:
-        for player in self.players:
-            player.reset()
+        for obj in self.players + self.bullets:
+            obj.reset()
+
 
