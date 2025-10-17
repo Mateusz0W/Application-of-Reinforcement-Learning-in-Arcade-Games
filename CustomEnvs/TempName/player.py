@@ -37,12 +37,8 @@ class Player(Entity):
         else:
             return None
         
-    def draw(self, screen):
+    def draw(self, screen) -> None:
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
-
-    def reset(self) -> None:
-        self.collision = False
-        self.collision_side = None
 
     def shoot(self, angle) -> None:
         bullet_x = self.x + self.width / 2
