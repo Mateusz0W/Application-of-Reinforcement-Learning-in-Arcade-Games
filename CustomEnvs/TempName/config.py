@@ -32,4 +32,5 @@ class ObstacleConfig:
 @dataclass(frozen=True)
 class BulletConfig:
     radius: int = 10
-    speed: int = 30
+    speed: int = 5
+    life: int = 3
