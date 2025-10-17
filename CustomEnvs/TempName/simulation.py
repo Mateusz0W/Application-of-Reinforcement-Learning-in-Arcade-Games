@@ -31,6 +31,8 @@ class Simulation:
         for bullet in self.bullets:
             bullet.update(self.players + self.obstacles)
 
+        self.delete_bullets()
+
     def _set_obstacles(self) -> list[Obstacle]:
         obstacles = []
         for _ in range(GameConfig.num_of_obstacles):
@@ -47,5 +49,10 @@ class Simulation:
     def reset(self) -> None:
         for obj in self.players + self.bullets:
             obj.reset()
+
+    def delete_bullets(self) -> None:
+        for idx, bullet in enumerate(self.bullets):
+            if bullet.life <= 0:
+                del self.bullets[idx]
 
 
