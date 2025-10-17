@@ -41,7 +41,7 @@ class Player(Entity):
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
 
     def shoot(self, angle) -> None:
-        bullet_x = self.x + self.width / 2
-        bullet_y = self.y + self.height / 2
-        return Bullet(bullet_x, bullet_y, BulletConfig.radius, Colors.Orange, BulletConfig.speed, angle)
+        bullet_x = self.x + self.width / 2 
+        bullet_y = self.y - self.height / 2 - BulletConfig.radius / 2
+        return Bullet(bullet_x, bullet_y, BulletConfig.radius, Colors.Orange, BulletConfig.speed, angle, BulletConfig.life)
 
