@@ -80,6 +80,6 @@ class Entity:
                 self.collision = True
                 self.collision_side = self._check_side_of_collision(other)
 
-    def reset(self) -> None:
+    def reset_collision_flags(self) -> None:
         self.collision = False
         self.collision_side = None
