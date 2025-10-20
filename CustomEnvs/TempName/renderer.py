@@ -1,6 +1,8 @@
 from config import GameConfig, Colors
 import pygame
 from simulation import Simulation
+import cv2
+import numpy as np
 
 class Renderer:
     def __init__(self) -> None:
@@ -18,8 +20,9 @@ class Renderer:
 
         self.screen.fill(Colors.Black)
         self.draw(sim)
-        pygame.display.update()
+        pygame.display.flip()
         self.clock.tick(GameConfig.fps)
+       # self.save_image()
 
         return running
     
@@ -32,6 +35,14 @@ class Renderer:
 
         for bulet in sim.bullets:
             bulet.draw(self.screen)
+
+    def save_image(self) -> np.ndarray:
+        image = pygame.surfarray.array3d(self.screen) 
+        image = np.transpose(image, (1, 0, 2))
+        image = cv2.resize(image, (250, 160), interpolation=cv2.INTER_AREA)
+        return image.astype(np.uint8)
+
+
 
         
 
