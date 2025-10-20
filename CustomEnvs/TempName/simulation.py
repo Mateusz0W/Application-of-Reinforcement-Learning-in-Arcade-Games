@@ -13,10 +13,12 @@ class Simulation:
         ]
         self.obstacles = self._set_obstacles()
         self.bullets = []
+        self.game_over = False
 
     def run(self) -> None:
         self.update()
-        self.reset()
+        self.reset_collision_flags()
+        self.restart_game()
 
     def update(self) -> None:
         keys = pygame.key.get_pressed()
@@ -30,7 +32,10 @@ class Simulation:
             self.bullets.append(self.players[1].shoot(120))
         for bullet in self.bullets:
             bullet.update(self.players + self.obstacles)
-
+            if any(player.hit_by_bullet for player in self.players):
+                self.game_over = True
+                break
+    
         self.delete_bullets()
 
     def _set_obstacles(self) -> list[Obstacle]:
@@ -46,13 +51,24 @@ class Simulation:
         
         return obstacles
     
-    def reset(self) -> None:
+    def reset_collision_flags(self) -> None:
         for obj in self.players + self.bullets:
-            obj.reset()
+            obj.reset_collision_flags()
 
     def delete_bullets(self) -> None:
         for idx, bullet in enumerate(self.bullets):
             if bullet.life <= 0:
                 del self.bullets[idx]
+
+    def restart_game(self) -> None:
+        if not self.game_over:
+            return
+        
+        self.players = [
+            Player(500,250,20,20,5,Colors.Blue),
+            Player(500,750,20,20,5,Colors.Red)
+        ]
+        self.bullets.clear()
+        self.game_over = False
 
 

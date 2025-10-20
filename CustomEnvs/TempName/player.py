@@ -8,6 +8,7 @@ class Player(Entity):
         super().__init__(x, y, width, height)
         self.speed = speed
         self.color = color
+        self.hit_by_bullet = False
 
     def update_position(self, direction: Direction) -> None:
         if direction == Direction.RIGHT and direction != self.collision_side:

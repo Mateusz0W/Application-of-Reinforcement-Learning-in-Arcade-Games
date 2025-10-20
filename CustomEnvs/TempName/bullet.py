@@ -24,6 +24,10 @@ class Bullet(Entity):
         for other in others:
             self.check_collision(other)
             if self.collision:
+                from player import Player
+                if isinstance(other, Player):
+                    other.hit_by_bullet = True
+                    return
                 if self.collision_side in (Direction.RIGHT, Direction.LEFT):
                     self.speed_x *= -1
                 else:
