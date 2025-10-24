@@ -12,7 +12,7 @@ class GameConfig:
     screen_width: int = 1000
     screen_height: int = 800
     fps: int = 60
-    num_of_obstacles: int = 10
+    num_of_obstacles: int = 20
 
 @dataclass(frozen=True)
 class Colors:
@@ -33,4 +33,8 @@ class ObstacleConfig:
 class BulletConfig:
     radius: int = 10
     speed: int = 5
-    life: int = 3
+    life: int = 4
+
+@dataclass(frozen=True)
+class PlayerConfig:
+    reload_time: int = 1
