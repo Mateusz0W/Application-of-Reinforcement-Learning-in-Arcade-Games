@@ -1,7 +1,8 @@
-from config import Direction, GameConfig, Colors, BulletConfig
+from config import Direction, GameConfig, Colors, BulletConfig, PlayerConfig
 import pygame
 from entity import Entity
 from bullet import Bullet
+import time
 
 class Player(Entity):
     def __init__(self,x: float, y: float, width: float, height: float, speed: float, color: Colors) -> None:
@@ -9,6 +10,8 @@ class Player(Entity):
         self.speed = speed
         self.color = color
         self.hit_by_bullet = False
+        self.read_to_shoot = True
+        self.last_shoot_time = time.time()
 
     def update_position(self, direction: Direction) -> None:
         if direction == Direction.RIGHT and direction != self.collision_side:
@@ -41,8 +44,16 @@ class Player(Entity):
     def draw(self, screen) -> None:
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
 
-    def shoot(self, angle) -> None:
+    def shoot(self, angle: int, current_time: float) -> None:
         bullet_x = self.x + self.width / 2 
         bullet_y = self.y - self.height / 2 - BulletConfig.radius / 2
+        self.read_to_shoot = False
+        self.last_shoot_time = time.time()
         return Bullet(bullet_x, bullet_y, BulletConfig.radius, Colors.Orange, BulletConfig.speed, angle, BulletConfig.life)
 
+    def reload(self, time: float) -> bool:
+        if not self.read_to_shoot and (time - self.last_shoot_time) > PlayerConfig.reload_time:
+            self.read_to_shoot = True
+            
+        return self.read_to_shoot
+    

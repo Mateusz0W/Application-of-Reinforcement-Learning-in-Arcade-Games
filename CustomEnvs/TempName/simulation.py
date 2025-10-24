@@ -4,6 +4,7 @@ from obstacle import Obstacle
 from config import GameConfig, ObstacleConfig, Colors
 import random
 import pygame
+import time
 
 class Simulation:
     def __init__(self) -> None: 
@@ -21,6 +22,7 @@ class Simulation:
         self.restart_game()
 
     def update(self) -> None:
+        current_time = time.time()
         keys = pygame.key.get_pressed()
         direction = Player.keyboard_input()
         self.players[1].check_collision(self.players[0])
@@ -28,8 +30,9 @@ class Simulation:
             self.players[1].check_collision(obstacle)
         if direction:
             self.players[1].update_position(direction)
-        if keys[pygame.K_SPACE]:
-            self.bullets.append(self.players[1].shoot(120))
+        if self.players[1].reload(current_time):
+            if keys[pygame.K_SPACE]:
+                self.bullets.append(self.players[1].shoot(120, current_time))
         for bullet in self.bullets:
             bullet.update(self.players + self.obstacles)
             if any(player.hit_by_bullet for player in self.players):
