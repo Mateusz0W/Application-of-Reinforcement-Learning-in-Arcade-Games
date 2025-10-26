@@ -5,9 +5,10 @@ from config import GameConfig, ObstacleConfig, Colors
 import random
 import pygame
 import time
+from renderer import  Renderer
 
 class Simulation:
-    def __init__(self) -> None: 
+    def __init__(self, render: bool=False) -> None: 
         self.players = [
             Player(500,250,20,20,5,Colors.Blue),
             Player(500,750,20,20,5,Colors.Red)
@@ -15,11 +16,15 @@ class Simulation:
         self.obstacles = self._set_obstacles()
         self.bullets = []
         self.game_over = False
+        self.renderer = Renderer(render)
+        self.running = True
 
-    def run(self) -> None:
+    def run(self) -> bool:
         self.update()
         self.reset_collision_flags()
         self.restart_game()
+        self.running, image = self.renderer.render(self,self.running)
+        return self.running
 
     def update(self) -> None:
         current_time = time.time()

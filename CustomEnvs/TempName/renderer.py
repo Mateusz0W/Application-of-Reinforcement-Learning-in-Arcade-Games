@@ -1,17 +1,22 @@
 from config import GameConfig, Colors
 import pygame
-from simulation import Simulation
 import cv2
 import numpy as np
+import os
 
 class Renderer:
-    def __init__(self) -> None:
+    def __init__(self, rendering: bool) -> None:
+        os.environ["SDL_VIDEODRIVER"] = "dummy" if not rendering else os.environ.get("SDL_VIDEODRIVER", "")
         pygame.init()
-        self.screen = pygame.display.set_mode((GameConfig.screen_width, GameConfig.screen_height))
+        if rendering:
+            self.screen = pygame.display.set_mode((GameConfig.screen_width, GameConfig.screen_height)) 
+        else:
+            self.screen = pygame.Surface((GameConfig.screen_width, GameConfig.screen_height))
         pygame.display.set_caption("game title")
         self.clock = pygame.time.Clock()
+        self.rendering = rendering
 
-    def render(self, sim: Simulation, running: bool) -> bool: 
+    def render(self, sim, running: bool) -> tuple[bool, np.ndarray]: 
         if not running:
             return 
         for event in pygame.event.get():
@@ -20,13 +25,13 @@ class Renderer:
 
         self.screen.fill(Colors.Black)
         self.draw(sim)
-        pygame.display.flip()
+        if self.rendering:
+            pygame.display.flip()
         self.clock.tick(GameConfig.fps)
-       # self.save_image()
 
-        return running
+        return running, self.save_image()
     
-    def draw(self, sim: Simulation) -> None:
+    def draw(self, sim) -> None:
         for player in sim.players:
             player.draw(self.screen)
 
