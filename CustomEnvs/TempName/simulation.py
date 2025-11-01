@@ -1,14 +1,14 @@
 from player import Player
 from config import Colors
 from obstacle import Obstacle
-from config import GameConfig, ObstacleConfig, Colors
+from config import GameConfig, ObstacleConfig, Colors, Direction
 import random
 import pygame
 import time
 from renderer import  Renderer
 
 class Simulation:
-    def __init__(self, render: bool=False) -> None: 
+    def __init__(self, render: bool=False, debuging: bool=False) -> None: 
         self.players = [
             Player(500,250,20,20,5,Colors.Blue),
             Player(500,750,20,20,5,Colors.Red)
@@ -18,26 +18,38 @@ class Simulation:
         self.game_over = False
         self.renderer = Renderer(render)
         self.running = True
+        self.image = None
+        self.debuging = debuging
 
-    def run(self) -> bool:
-        self.update()
+    def run(self, action: int) -> bool:
+        self.update(action)
         self.reset_collision_flags()
-        self.restart_game()
-        self.running, image = self.renderer.render(self,self.running)
+        if self.debuging:
+            self.restart_game()
+        self.running, self.image = self.renderer.render(self,self.running)
         return self.running
 
-    def update(self) -> None:
+    def update(self, action: int) -> None:
         current_time = time.time()
-        keys = pygame.key.get_pressed()
-        direction = Player.keyboard_input()
+        if self.debuging:
+            direction, space_pressed = self._keyboard_input()
+            angle = 120
+        else:
+            if isinstance(action, Direction):
+                direction = action
+                space_pressed = False
+            else:
+                direction = None
+                space_pressed = True
+                angle = action
         self.players[1].check_collision(self.players[0])
         for obstacle in self.obstacles:
             self.players[1].check_collision(obstacle)
         if direction:
             self.players[1].update_position(direction)
         if self.players[1].reload(current_time):
-            if keys[pygame.K_SPACE]:
-                self.bullets.append(self.players[1].shoot(120, current_time))
+            if space_pressed:
+                self.bullets.append(self.players[1].shoot(angle, current_time))
         for bullet in self.bullets:
             bullet.update(self.players + self.obstacles)
             if any(player.hit_by_bullet for player in self.players):
@@ -78,5 +90,13 @@ class Simulation:
         ]
         self.bullets.clear()
         self.game_over = False
+
+    def _keyboard_input(self) -> tuple:
+        keys = pygame.key.get_pressed()
+        direction = Player.keyboard_input()
+        space_pressed = True if keys[pygame.K_SPACE] else False
+
+        return direction, space_pressed
+
 
 
