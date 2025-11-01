@@ -3,6 +3,7 @@ import pygame
 from entity import Entity
 from bullet import Bullet
 import time
+import math
 
 class Player(Entity):
     def __init__(self,x: float, y: float, width: float, height: float, speed: float, color: Colors) -> None:
@@ -45,8 +46,7 @@ class Player(Entity):
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
 
     def shoot(self, angle: int, current_time: float) -> None:
-        bullet_x = self.x + self.width / 2 
-        bullet_y = self.y - self.height / 2 - BulletConfig.radius / 2
+        bullet_x, bullet_y = self._set_bullet_starting_position(angle) 
         self.read_to_shoot = False
         self.last_shoot_time = time.time()
         return Bullet(bullet_x, bullet_y, BulletConfig.radius, Colors.Orange, BulletConfig.speed, angle, BulletConfig.life)
@@ -57,3 +57,12 @@ class Player(Entity):
             
         return self.read_to_shoot
     
+    def _set_bullet_starting_position(self, angle: int):
+        center_x = self.x + self.width / 2
+        center_y = self.y + self.height / 2
+        angle_radians = math.radians(angle)
+        r = self.width * 2 ** 0.5 + 0.1
+        bullet_x = center_x + r * math.cos(angle_radians)
+        bullet_y = center_y + r * math.sin(angle_radians)
+
+        return bullet_x, bullet_y
