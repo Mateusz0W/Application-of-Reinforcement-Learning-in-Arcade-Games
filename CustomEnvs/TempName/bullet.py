@@ -15,7 +15,7 @@ class Bullet(Entity):
 
     def update_position(self) -> None:
         self.x += self.speed_x * math.cos(math.radians(self.angle))
-        self.y -= self.speed_y * math.sin(math.radians(self.angle))
+        self.y += self.speed_y * math.sin(math.radians(self.angle))
 
     def draw(self, screen) -> None:
         pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius)
