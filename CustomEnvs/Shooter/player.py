@@ -1,7 +1,7 @@
-from config import Direction, GameConfig, Colors, BulletConfig, PlayerConfig
+from CustomEnvs.Shooter.config import Direction, GameConfig, Colors, BulletConfig, PlayerConfig
 import pygame
-from entity import Entity
-from bullet import Bullet
+from CustomEnvs.Shooter.entity import Entity
+from CustomEnvs.Shooter.bullet import Bullet
 import time
 import math
 

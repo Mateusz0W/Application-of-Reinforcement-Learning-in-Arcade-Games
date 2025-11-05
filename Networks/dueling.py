@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-from conv import Conv
+from Networks.conv import Conv
 
 
 class Dueling(Conv):

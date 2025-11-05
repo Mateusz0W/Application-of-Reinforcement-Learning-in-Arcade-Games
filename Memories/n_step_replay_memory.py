@@ -1,4 +1,4 @@
-from replay_memory import ReplayMemory
+from Memories.replay_memory import ReplayMemory
 import numpy as np
 from collections import namedtuple
 

@@ -1,4 +1,4 @@
-from dqn import DQN
+from Algorithms.dqn import DQN
 import torch
 import numpy as np
 

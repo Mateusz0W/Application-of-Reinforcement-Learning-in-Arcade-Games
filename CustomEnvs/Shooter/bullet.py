@@ -1,5 +1,5 @@
-from entity import Entity
-from config import GameConfig, Direction
+from CustomEnvs.Shooter.entity import Entity
+from CustomEnvs.Shooter.config import GameConfig, Direction
 import math
 import pygame
 
@@ -24,7 +24,7 @@ class Bullet(Entity):
         for other in others:
             self.check_collision(other)
             if self.collision:
-                from player import Player
+                from CustomEnvs.Shooter.player import Player
                 if isinstance(other, Player):
                     other.hit_by_bullet = True
                     return

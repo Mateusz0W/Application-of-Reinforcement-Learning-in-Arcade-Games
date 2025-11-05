@@ -1,4 +1,4 @@
-from config import Direction
+from CustomEnvs.Shooter.config import Direction
 
 class Entity:
     def __init__(self, x: float, y: float, width: float, height: float, radius: float = None):

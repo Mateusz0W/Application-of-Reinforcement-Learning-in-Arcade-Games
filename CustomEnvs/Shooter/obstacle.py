@@ -1,4 +1,4 @@
-from entity import Entity
+from CustomEnvs.Shooter.entity import Entity
 import pygame
 
 class Obstacle(Entity):

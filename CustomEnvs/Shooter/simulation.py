@@ -1,11 +1,11 @@
-from player import Player
-from config import Colors
-from obstacle import Obstacle
-from config import GameConfig, ObstacleConfig, Colors, Direction
+from CustomEnvs.Shooter.player import Player
+from CustomEnvs.Shooter.config import Colors
+from CustomEnvs.Shooter.obstacle import Obstacle
+from CustomEnvs.Shooter.config import GameConfig, ObstacleConfig, Colors, Direction
 import random
 import pygame
 import time
-from renderer import  Renderer
+from CustomEnvs.Shooter.renderer import  Renderer
 
 class Simulation:
     def __init__(self, render: bool=False, debuging: bool=False) -> None: 
@@ -15,7 +15,7 @@ class Simulation:
         ]
         self.obstacles = self._set_obstacles()
         self.bullets = []
-        self.game_over = False
+        self.game_over = True
         self.renderer = Renderer(render)
         self.running = True
         self.image = None
@@ -90,6 +90,7 @@ class Simulation:
         ]
         self.bullets.clear()
         self.game_over = False
+        self.running, self.image = self.renderer.render(self,self.running)
 
     def _keyboard_input(self) -> tuple:
         keys = pygame.key.get_pressed()

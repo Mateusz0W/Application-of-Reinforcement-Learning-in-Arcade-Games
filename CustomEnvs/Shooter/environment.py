@@ -1,8 +1,8 @@
 import gymnasium as gym
 from gymnasium.spaces import Box, Discrete
-from simulation import Simulation
+from CustomEnvs.Shooter.simulation import Simulation
 import numpy as np
-from config import Direction
+from CustomEnvs.Shooter.config import Direction
 
 class ShooterEnv(gym.Env):
     metadata = {"render_modes": ["human"]} 
@@ -17,7 +17,7 @@ class ShooterEnv(gym.Env):
         self.observation_space = Box(
             low=0,
             high=255,
-            shape=(255, 160, 3),
+            shape=(250, 160, 3),
             dtype=np.uint8
         )
 
@@ -54,10 +54,9 @@ class ShooterEnv(gym.Env):
     def reset(self, seed: int|None =None, options: dict|None =None) -> tuple:
         super().reset(seed=seed)
 
+        self.simulation.restart_game()
         observation = self._get_obs()
         info = self._get_info()
-        self.simulation.restart_game()
-
         return observation, info
     
     def step(self, action: int) -> tuple:
@@ -75,7 +74,7 @@ class ShooterEnv(gym.Env):
 
 gym.register(
     id = 'Shooter-v0',
-    entry_point = 'environment:ShooterEnv',
+    entry_point = 'CustomEnvs.Shooter.environment:ShooterEnv',
     #max_episode_steps = 1_000,
 )
 

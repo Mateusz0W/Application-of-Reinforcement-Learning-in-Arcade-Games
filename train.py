@@ -20,10 +20,12 @@ from Networks.dueling import Dueling
 from Networks.noisy import Noisy
 
 from Memories.replay_memory import ReplayMemory
-from Memories.prio_replay_memory import PrioReplayMemory
+#from Memories.prio_replay_memory import PrioReplayMemory
 from Memories.n_step_replay_memory import NStepReplayMemory
 
 from plotter import Plotter
+
+import CustomEnvs.Shooter.environment 
 
 device = torch.device(
     "cuda" if torch.cuda.is_available() else
@@ -33,7 +35,10 @@ device = torch.device(
 
 os.makedirs("models", exist_ok=True)
 
-metadata = {"DQNs": ["DQN","Double_DQN"]}
+metadata = {
+    "DQNs": ["DQN", "Double_DQN", "PrioDQN", "DuelingDQN", "NoisyDQN", "NStepDQN"],
+    "Env": ["ALE/MsPacman-v5", "Shooter-v0"]
+    }
 
 def setup(alg, env, hyp: Hyp):
 
@@ -105,14 +110,25 @@ def process_batch_prio_dqn(optimizer, buffer, dqn, batch_size, net, target_net, 
 
 
 if __name__ == "__main__":
-    assert sys.argv[1] in metadata["DQNs"], "Error: Wrong algortihm name"
-    assert sys.argv[1] == "NStepDQN" and len(sys.argv) != 3 and int(sys.argv[2]) < 0, "Error: Missing n argument or n must be non-negative"
+
+    assert len(sys.argv) >= 3, "Error Missing arguments" 
+
+    env_name = sys.argv[1]
+    algorithm = sys.argv[2]
+    algorithm_param = sys.argv[3]
+
+    assert env_name in metadata["Env"], "Error: Wrong env name"
+    assert algorithm in metadata["DQNs"], "Error: Wrong algortihm name"
+    #assert algorithm == "NStepDQN" and len(sys.argv) != 4 and int(algorithm_param) < 0, "Error: Missing n argument or n must be non-negative"
 
     gym.register_envs(ale_py)
-    env = Wrappers.make_env("ALE/MsPacman-v5")
+    if env_name == "ALE/MsPacman-v5":
+        env = Wrappers.make_env(env_name)
+    else:
+        env = Wrappers.make_env(env_name, render_mode='human')
     hyp = Hyp(
         MEAN_REWARD_BOUND = 2500,
-        GAMMA = 0.99 if sys.argv[1] != "NStepDQN" else 0.99 ** int(sys.argv[2]),
+        GAMMA = 0.99 if algorithm != "NStepDQN" else 0.99 ** int(algorithm_param),
         BATCH_SIZE = 32,
         REPLAY_SIZE = 10_000,
         REPLAY_START_SIZE = 10_000,
@@ -122,8 +138,8 @@ if __name__ == "__main__":
         EPSILON_START = 1.0,
         EPSILON_FINAL = 0.01
     )
-    net, target_net, dqn, agent, optimizer, process_batch, buffer = setup(sys.argv[1], env, hyp)
-    writer = SummaryWriter(comment="Donkey Kong")
+    net, target_net, dqn, agent, optimizer, process_batch, buffer = setup(algorithm, env, hyp)
+    writer = SummaryWriter(comment=env_name)
     epsilon = hyp.EPSILON_START
     total_rewards = []
     frame_idx = 0
@@ -155,7 +171,7 @@ if __name__ == "__main__":
             writer.add_scalar("reward", reward, frame_idx)
 
             if best_mean_reward is None or best_mean_reward < mean_reward:
-                torch.save(net.state_dict(), f"models/Donkey-Kong-best_{mean_reward}_{int(time.time())}.dat")
+                torch.save(net.state_dict(), f"models/{env_name}-best_{mean_reward}_{int(time.time())}.dat")
 
                 if best_mean_reward is not None:
                     print("\nBest reward updated %.3f -> %.3f" % (best_mean_reward, mean_reward))
@@ -173,4 +189,4 @@ if __name__ == "__main__":
         loss.append(loss_t)
 
     total_time = (time.time() - start_time) / 3600
-    Plotter.plot(total_rewards,steps,fps,str(sys.argv[1]))
+    Plotter.plot(total_rewards,steps,fps,str(algorithm))
