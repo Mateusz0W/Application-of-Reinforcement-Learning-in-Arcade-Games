@@ -34,7 +34,9 @@ class BulletConfig:
     radius: int = 10
     speed: int = 5
     life: int = 4
+    damage: int = 40
 
 @dataclass(frozen=True)
 class PlayerConfig:
     reload_time: int = 1
+    health: int = 100
