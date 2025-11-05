@@ -10,8 +10,8 @@ from CustomEnvs.Shooter.renderer import  Renderer
 class Simulation:
     def __init__(self, render: bool=False, debuging: bool=False) -> None: 
         self.players = [
-            Player(500,250,20,20,5,Colors.Blue),
-            Player(500,750,20,20,5,Colors.Red)
+            Player(500,250,20,20,5,Colors.Blue, id=1),
+            Player(500,750,20,20,5,Colors.Red, id=2)
         ]
         self.obstacles = self._set_obstacles()
         self.bullets = []
@@ -87,8 +87,8 @@ class Simulation:
             return
         
         self.players = [
-            Player(500,250,20,20,5,Colors.Blue),
-            Player(500,750,20,20,5,Colors.Red)
+            Player(500,250,20,20,5,Colors.Blue, id=1),
+            Player(500,750,20,20,5,Colors.Red, id=2)
         ]
         self.bullets.clear()
         self.game_over = False

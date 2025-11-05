@@ -6,7 +6,7 @@ import time
 import math
 
 class Player(Entity):
-    def __init__(self,x: float, y: float, width: float, height: float, speed: float, color: Colors) -> None:
+    def __init__(self,x: float, y: float, width: float, height: float, speed: float, color: Colors, id: int) -> None:
         super().__init__(x, y, width, height)
         self.speed = speed
         self.color = color
@@ -14,6 +14,8 @@ class Player(Entity):
         self.read_to_shoot = True
         self.last_shoot_time = time.time()
         self.health = PlayerConfig.health
+        self.id = id
+        self.hit_by_own_bullet = False
 
     def update_position(self, direction: Direction) -> None:
         if direction == Direction.RIGHT and direction != self.collision_side:
@@ -50,7 +52,7 @@ class Player(Entity):
         bullet_x, bullet_y = self._set_bullet_starting_position(angle) 
         self.read_to_shoot = False
         self.last_shoot_time = time.time()
-        return Bullet(bullet_x, bullet_y, BulletConfig.radius, Colors.Orange, BulletConfig.speed, angle, BulletConfig.life)
+        return Bullet(bullet_x, bullet_y, BulletConfig.radius, Colors.Orange, BulletConfig.speed, angle, BulletConfig.life, id=self.id)
 
     def reload(self, time: float) -> bool:
         if not self.read_to_shoot and (time - self.last_shoot_time) > PlayerConfig.reload_time:
@@ -72,3 +74,4 @@ class Player(Entity):
         if self.hit_by_bullet:
             self.health -= BulletConfig.damage
             self.hit_by_bullet = False
+            self.hit_by_own_bullet = False
