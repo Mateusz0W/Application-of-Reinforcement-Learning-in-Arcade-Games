@@ -27,6 +27,7 @@ class Bullet(Entity):
                 from CustomEnvs.Shooter.player import Player
                 if isinstance(other, Player):
                     other.hit_by_bullet = True
+                    self.life = 0
                     return
                 if self.collision_side in (Direction.RIGHT, Direction.LEFT):
                     self.speed_x *= -1
