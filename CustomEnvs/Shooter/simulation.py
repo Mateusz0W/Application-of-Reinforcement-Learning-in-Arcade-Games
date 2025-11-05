@@ -52,7 +52,9 @@ class Simulation:
                 self.bullets.append(self.players[1].shoot(angle, current_time))
         for bullet in self.bullets:
             bullet.update(self.players + self.obstacles)
-            if any(player.hit_by_bullet for player in self.players):
+            for player in self.players:
+                player.reduce_health()
+            if any(player.health <= 0 for player in self.players):
                 self.game_over = True
                 break
     

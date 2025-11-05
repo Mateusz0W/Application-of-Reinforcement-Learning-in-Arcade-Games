@@ -13,6 +13,7 @@ class Player(Entity):
         self.hit_by_bullet = False
         self.read_to_shoot = True
         self.last_shoot_time = time.time()
+        self.health = PlayerConfig.health
 
     def update_position(self, direction: Direction) -> None:
         if direction == Direction.RIGHT and direction != self.collision_side:
@@ -57,7 +58,7 @@ class Player(Entity):
             
         return self.read_to_shoot
     
-    def _set_bullet_starting_position(self, angle: int):
+    def _set_bullet_starting_position(self, angle: int) -> tuple[float, float]:
         center_x = self.x + self.width / 2
         center_y = self.y + self.height / 2
         angle_radians = math.radians(angle)
@@ -66,3 +67,8 @@ class Player(Entity):
         bullet_y = center_y + r * math.sin(angle_radians)
 
         return bullet_x, bullet_y
+    
+    def reduce_health(self) -> None:
+        if self.hit_by_bullet:
+            self.health -= BulletConfig.damage
+            self.hit_by_bullet = False
