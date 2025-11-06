@@ -125,16 +125,17 @@ if __name__ == "__main__":
     if env_name == "ALE/MsPacman-v5":
         env = Wrappers.make_env(env_name)
     else:
-        env = Wrappers.make_env(env_name, render_mode='human')
+        #env = Wrappers.make_env(env_name, render_mode='human')
+        env = Wrappers.make_env(env_name)
     hyp = Hyp(
-        MEAN_REWARD_BOUND = 2500,
+        MEAN_REWARD_BOUND = 1_000,
         GAMMA = 0.99 if algorithm != "NStepDQN" else 0.99 ** int(algorithm_param),
         BATCH_SIZE = 32,
         REPLAY_SIZE = 10_000,
         REPLAY_START_SIZE = 10_000,
         LEARNING_RATE = 1e-4,
         SYNC_TARGET_FRAMES = 1_000,
-        EPSILON_DECAY_LAST_FRAME = 150_000,
+        EPSILON_DECAY_LAST_FRAME = 75_000, #150_000
         EPSILON_START = 1.0,
         EPSILON_FINAL = 0.01
     )
