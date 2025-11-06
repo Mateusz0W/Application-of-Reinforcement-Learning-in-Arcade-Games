@@ -27,10 +27,13 @@ class Simulation:
         if self.debuging:
             self.restart_game()
         self.running, self.image = self.renderer.render(self,self.running)
+        self.delete_bullets()
         return self.running
 
     def update(self, action: int) -> None:
         current_time = time.time()
+        for player in self.players:
+            player.reset_counters()
         if self.debuging:
             direction, space_pressed = self._keyboard_input()
             angle = 120
@@ -58,7 +61,6 @@ class Simulation:
                 self.game_over = True
                 break
     
-        self.delete_bullets()
 
     def _set_obstacles(self) -> list[Obstacle]:
         obstacles = []

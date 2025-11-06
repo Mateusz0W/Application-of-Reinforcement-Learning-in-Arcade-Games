@@ -16,8 +16,12 @@ class Player(Entity):
         self.health = PlayerConfig.health
         self.id = id
         self.hit_by_own_bullet = False
+        self.last_position = (x, y)
+        self.bullet_hits = 0
+        self.own_bullet_hits = 0
 
     def update_position(self, direction: Direction) -> None:
+        self.last_position = (self.x, self.y)
         if direction == Direction.RIGHT and direction != self.collision_side:
             self.x += self.speed
         elif direction == Direction.LEFT and direction != self.collision_side:
@@ -75,3 +79,9 @@ class Player(Entity):
             self.health -= BulletConfig.damage
             self.hit_by_bullet = False
             self.hit_by_own_bullet = False
+    
+    def reset_counters(self) -> None:
+        self.bullet_hits = 0
+        self.own_bullet_hits = 0
+            
+        

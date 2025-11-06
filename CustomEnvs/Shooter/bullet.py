@@ -31,6 +31,9 @@ class Bullet(Entity):
                     self.life = 0
                     if self.id == other.id:
                         other.hit_by_own_bullet = True
+                        other.own_bullet_hits += 1
+                    else:
+                        other.hit_by_bullet += 1
                     return
                 if self.collision_side in (Direction.RIGHT, Direction.LEFT):
                     self.speed_x *= -1
