@@ -21,20 +21,20 @@ class ShooterEnv(gym.Env):
             dtype=np.uint8
         )
 
-        self.action_space = Discrete(364)
+        self.action_space = Discrete(40)
 
     def _map_action(self, action: int) -> Direction|int:
         match action:
-            case 360:
+            case 36:
                 return Direction.DOWN
-            case 361:
+            case 37:
                 return Direction.UP
-            case 362:
+            case 38:
                 return Direction.LEFT
-            case 363: 
+            case 39: 
                 return Direction.RIGHT
             case _:
-                return action
+                return action * 10
             
     def _get_obs(self) -> tuple:
         return self.simulation.image
@@ -44,10 +44,19 @@ class ShooterEnv(gym.Env):
     
     def _get_reward(self) -> int:
         reward = 0
-        if self.simulation.players[0].hit_by_bullet:
-            reward += 50
-        if self.simulation.players[1].hit_by_bullet:
-            reward -= 50
+        player = self.simulation.players[1]
+        enemy = self.simulation.players[0]
+
+        reward += 10 * enemy.bullet_hits
+        reward -= 10 * player.bullet_hits
+        reward -= 50 * player.own_bullet_hits
+        if player.health <= 0:
+            reward -= 100
+        if enemy.health <= 0:
+            reward += 100
+        
+        reward -= 0.01
+        
 
         return reward
     
