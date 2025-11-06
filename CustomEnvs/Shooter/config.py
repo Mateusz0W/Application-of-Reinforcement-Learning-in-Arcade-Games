@@ -12,7 +12,7 @@ class GameConfig:
     screen_width: int = 1000
     screen_height: int = 800
     fps: int = 60
-    num_of_obstacles: int = 20
+    num_of_obstacles: int = 12
 
 @dataclass(frozen=True)
 class Colors:
