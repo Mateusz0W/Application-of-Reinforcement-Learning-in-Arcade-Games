@@ -5,13 +5,14 @@ from CustomEnvs.Shooter.config import GameConfig, ObstacleConfig, Colors, Direct
 import random
 import pygame
 import time
+import json
 from CustomEnvs.Shooter.renderer import  Renderer
 
 class Simulation:
     def __init__(self, render: bool=False, debuging: bool=False) -> None: 
         self.players = [
-            Player(500,250,20,20,5,Colors.Blue, id=1),
-            Player(500,750,20,20,5,Colors.Red, id=2)
+            Player(GameConfig.screen_width // 2,50,20,20,5,Colors.Blue, id=1),
+            Player(GameConfig.screen_width // 2,GameConfig.screen_height - 50,20,20,5,Colors.Red, id=2)
         ]
         self.obstacles = self._set_obstacles()
         self.bullets = []
@@ -63,16 +64,12 @@ class Simulation:
     
 
     def _set_obstacles(self) -> list[Obstacle]:
-        obstacles = []
-        for _ in range(GameConfig.num_of_obstacles):
-            x = random.randint(0, GameConfig.screen_width)
-            y = random.randint(0, GameConfig.screen_height)
-
-            width = random.randint(ObstacleConfig.min_width, ObstacleConfig.max_width)
-            height = random.randint(ObstacleConfig.min_height, ObstacleConfig.max_height)
-
-            obstacles.append(Obstacle(x, y, width, height, Colors.Green))
+        with open("CustomEnvs/Shooter/map.json" ,'r') as file:
+            data = json.load(file)
         
+        obstacle_data = data["Obstacles"]
+        obstacles = [Obstacle(obs['x'], obs['y'], obs['width'], obs['height'], Colors.Green) for obs in obstacle_data]
+  
         return obstacles
     
     def reset_collision_flags(self) -> None:
@@ -89,8 +86,8 @@ class Simulation:
             return
         
         self.players = [
-            Player(500,250,20,20,5,Colors.Blue, id=1),
-            Player(500,750,20,20,5,Colors.Red, id=2)
+            Player(GameConfig.screen_width // 2,50,20,20,5,Colors.Blue, id=1),
+            Player(GameConfig.screen_width // 2,GameConfig.screen_height - 50,20,20,5,Colors.Red, id=2)
         ]
         self.bullets.clear()
         self.game_over = False
