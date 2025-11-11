@@ -45,9 +45,11 @@ class Bullet(Entity):
         
         if not 0 <= self.x <= GameConfig.screen_width:
             self.speed_x *= -1
+            self.life -= 1
 
         if not 0 <= self.y <= GameConfig.screen_height:
             self.speed_y *= -1
+            self.life -= 1
 
         self.update_position()
 
