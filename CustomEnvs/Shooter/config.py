@@ -9,8 +9,8 @@ class Direction(Enum):
 
 @dataclass(frozen=True)
 class GameConfig:
-    screen_width: int = 1000
-    screen_height: int = 800
+    screen_width: int = 800
+    screen_height: int = 600
     fps: int = 60
     num_of_obstacles: int = 12
 
