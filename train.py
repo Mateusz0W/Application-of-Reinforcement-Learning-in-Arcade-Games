@@ -20,7 +20,7 @@ from Networks.dueling import Dueling
 from Networks.noisy import Noisy
 
 from Memories.replay_memory import ReplayMemory
-#from Memories.prio_replay_memory import PrioReplayMemory
+from Memories.prio_replay_memory import PrioReplayMemory
 from Memories.n_step_replay_memory import NStepReplayMemory
 
 from plotter import Plotter
@@ -125,8 +125,8 @@ if __name__ == "__main__":
     if env_name == "ALE/MsPacman-v5":
         env = Wrappers.make_env(env_name)
     else:
-        #env = Wrappers.make_env(env_name, render_mode='human')
-        env = Wrappers.make_env(env_name)
+        env = Wrappers.make_env(env_name, render_mode='human')
+        #env = Wrappers.make_env(env_name)
     hyp = Hyp(
         MEAN_REWARD_BOUND = 1_000,
         GAMMA = 0.99 if algorithm != "NStepDQN" else 0.99 ** int(algorithm_param),
