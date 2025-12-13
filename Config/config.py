@@ -17,6 +17,7 @@ class Hyperparameters:
         return f"Hyperparameters:\n\
         Mean reward bound = {self.MEAN_REWARD_BOUND}\n\
         Gamma = {self.GAMMA}\n\
+        Batch size = {self.BATCH_SIZE}\n\
         Replay size = {self.REPLAY_SIZE}\n\
         Replay start size = {self.REPLAY_START_SIZE}\n\
         Learning rate = {self.LEARNING_RATE}\n\
@@ -25,6 +26,3 @@ class Hyperparameters:
         Epsilon start = {self.EPSILON_START}\n\
         Epsilon final = {self.EPSILON_FINAL}\n\
         "
-
-
-
