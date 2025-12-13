@@ -9,10 +9,10 @@ class ShooterEnv(gym.Env):
 
     def __init__(self, render_mode = None):
         super().__init__()
-
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
         self.simulation = Simulation(render= True if self.render_mode == "human" else False)
+        self.n_agents = 2
 
         self.observation_space = Box(
             low=0,
@@ -42,48 +42,47 @@ class ShooterEnv(gym.Env):
     def _get_info(self) -> tuple:
         return {}
     
-    def _get_reward(self) -> int:
-        reward = 0
-        player = self.simulation.players[1]
-        enemy = self.simulation.players[0]
+    def _get_rewards(self) -> list[int]:
+        rewards = [0] * self.n_agents
+        for idx in range(self.n_agents):
+            player = self.simulation.players[idx]
+            enemy = self.simulation.players[int(not idx)]
 
-        reward += 10 * enemy.bullet_hits
-        reward -= 10 * player.bullet_hits
-        reward -= 50 * player.own_bullet_hits
-        if player.health <= 0:
-            reward -= 100
-        if enemy.health <= 0:
-            reward += 100
-        
-        #reward -= 0.01
-    
-        return reward
+            rewards[idx] += 10 * enemy.bullet_hits
+            rewards[idx] -= 10 * player.bullet_hits
+            rewards[idx] -= 50 * player.own_bullet_hits
+            if player.health <= 0:
+                rewards[idx] -= 100
+            if enemy.health <= 0:
+                rewards[idx] += 100
+            
+        return rewards
     
     def reset(self, seed: int|None =None, options: dict|None =None) -> tuple:
         super().reset(seed=seed)
-
+        self.simulation.game_over = True
         self.simulation.restart_game()
         observation = self._get_obs()
         info = self._get_info()
         return observation, info
     
-    def step(self, action: int) -> tuple:
+    def step(self, actions: list[int]) -> tuple:
 
-        action = self._map_action(action)
-        self.simulation.run(action)
+        actions = [self._map_action(action) for action in actions]
+        self.simulation.run(actions)
         terminated = self.simulation.game_over
         observation = self._get_obs()
         info = self._get_info()
         truncated = False
-        reward = self._get_reward()
+        rewards = self._get_rewards()
         
-        return observation, reward, terminated, truncated, info
+        return observation, rewards, terminated, truncated, info
     
 
 gym.register(
     id = 'Shooter-v0',
     entry_point = 'CustomEnvs.Shooter.environment:ShooterEnv',
-    #max_episode_steps = 1_000,
+    max_episode_steps = 2_000,
 )
 
 
