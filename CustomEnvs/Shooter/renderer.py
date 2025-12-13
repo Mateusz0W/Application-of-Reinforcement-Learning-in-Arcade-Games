@@ -8,11 +8,13 @@ class Renderer:
     def __init__(self, rendering: bool) -> None:
         os.environ["SDL_VIDEODRIVER"] = "dummy" if not rendering else os.environ.get("SDL_VIDEODRIVER", "")
         pygame.init()
+        self.obs_w, self.obs_h = 160, 250
         if rendering:
             self.screen = pygame.display.set_mode((GameConfig.screen_width, GameConfig.screen_height)) 
         else:
             self.screen = pygame.Surface((GameConfig.screen_width, GameConfig.screen_height))
-        pygame.display.set_caption("game title")
+        self.observation_surface = pygame.Surface((self.obs_w, self.obs_h))
+        pygame.display.set_caption("Shooter")
         self.clock = pygame.time.Clock()
         self.rendering = rendering
 
@@ -27,7 +29,7 @@ class Renderer:
         self.draw(sim)
         if self.rendering:
             pygame.display.flip()
-        self.clock.tick(GameConfig.fps)
+            self.clock.tick(GameConfig.fps)
 
         return running, self.save_image()
     
@@ -42,10 +44,14 @@ class Renderer:
             bulet.draw(self.screen)
 
     def save_image(self) -> np.ndarray:
-        image = pygame.surfarray.array3d(self.screen) 
+        pygame.transform.scale(self.screen, (self.obs_w, self.obs_h), self.observation_surface)
+        image = pygame.surfarray.array3d(self.observation_surface)
         image = np.transpose(image, (1, 0, 2))
-        image = cv2.resize(image, (160, 250), interpolation=cv2.INTER_AREA)
         return image.astype(np.uint8)
+        # image = pygame.surfarray.array3d(self.screen) 
+        # image = np.transpose(image, (1, 0, 2))
+        # image = cv2.resize(image, (160, 250), interpolation=cv2.INTER_AREA)
+        # return image.astype(np.uint8)
 
 
 
