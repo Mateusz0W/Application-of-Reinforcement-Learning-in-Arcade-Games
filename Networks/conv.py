@@ -15,9 +15,9 @@ class Conv(nn.Module):
             nn.ReLU()
         )
 
-        conv_out_size = self._get_conv_out(input_shape)
+        self.conv_out_size = self._get_conv_out(input_shape)
         self.fc = nn.Sequential(
-            nn.Linear(conv_out_size, 512),
+            nn.Linear(self.conv_out_size, 512),
             nn.ReLU(),
             nn.Linear(512, n_actions)
         )
@@ -27,5 +27,6 @@ class Conv(nn.Module):
         return int(np.prod(o.size()))
     
     def forward(self, x):
-        conv_out = self.conv(x).view(x.size()[0], -1)
+        fx = x.float() / 255
+        conv_out = self.conv(fx).view(fx.size()[0], -1)
         return self.fc(conv_out)

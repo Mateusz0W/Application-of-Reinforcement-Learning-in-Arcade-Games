@@ -36,6 +36,6 @@ class Dueling(Conv):
         return val + (adv -  adv.mean(dim=1, keepdim=True))
     
     def adv_val(self, x):
-        fx = x.float() / 256
+        fx = x.float() / 255
         conv_out = self.conv(fx).view(fx.size()[0], -1)
         return self.fc_adv(conv_out), self.fc_val(conv_out)
