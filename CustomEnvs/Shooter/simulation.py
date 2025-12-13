@@ -22,8 +22,8 @@ class Simulation:
         self.image = None
         self.debuging = debuging
 
-    def run(self, action: int) -> bool:
-        self.update(action)
+    def run(self, actions: list[int]) -> bool:
+        self.update(actions)
         self.reset_collision_flags()
         if self.debuging:
             self.restart_game()
@@ -31,36 +31,47 @@ class Simulation:
         self.delete_bullets()
         return self.running
 
-    def update(self, action: int) -> None:
+    def update(self, actions: list[int]) -> None:
         current_time = time.time()
+        players_actions = []
         for player in self.players:
             player.reset_counters()
         if self.debuging:
             direction, space_pressed = self._keyboard_input()
             angle = 120
         else:
-            if isinstance(action, Direction):
-                direction = action
-                space_pressed = False
-            else:
-                direction = None
-                space_pressed = True
-                angle = action
+            for action in actions:
+                if isinstance(action, Direction):
+                    direction = action
+                    space_pressed = False
+                    angle = None
+                else:
+                    direction = None
+                    space_pressed = True
+                    angle = action
+                players_actions.append((direction, space_pressed, angle))
+
+        self.players[0].check_collision(self.players[1])
         self.players[1].check_collision(self.players[0])
+
         for obstacle in self.obstacles:
+            self.players[0].check_collision(obstacle)
             self.players[1].check_collision(obstacle)
-        if direction:
-            self.players[1].update_position(direction)
-        if self.players[1].reload(current_time):
-            if space_pressed:
-                self.bullets.append(self.players[1].shoot(angle, current_time))
+        
+        for idx, (direction, space_pressed, angle) in enumerate(players_actions):
+            if direction:
+                self.players[idx].update_position(direction)
+            if self.players[idx].reload(current_time):
+                if space_pressed:
+                    self.bullets.append(self.players[idx].shoot(angle, current_time))
+
         for bullet in self.bullets:
             bullet.update(self.players + self.obstacles)
-            for player in self.players:
-                player.reduce_health()
-            if any(player.health <= 0 for player in self.players):
-                self.game_over = True
-                break
+        for player in self.players:
+            player.reduce_health()
+        if any(player.health <= 0 for player in self.players):
+            self.game_over = True
+
     
 
     def _set_obstacles(self) -> list[Obstacle]:
