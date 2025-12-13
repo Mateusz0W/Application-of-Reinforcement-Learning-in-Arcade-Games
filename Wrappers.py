@@ -10,20 +10,21 @@ class MaxAndSkipEnv(gym.Wrapper):
         self._skip = skip
 
     def step(self, action):
-        total_reward = 0.
+        total_rewards = [0., 0.]
         terminated = False
         truncated = False
 
         for _ in range(self._skip):
-            obs, reward, term, trunc, info = self.env.step(action)
+            obs, rewards, term, trunc, info = self.env.step(action)
             self._obs_buffer.append(obs)
-            total_reward += reward
+            total_rewards[0] += rewards[0]
+            total_rewards[1] += rewards[1]
             if term or trunc:
                 terminated, truncated = term, trunc
                 break
 
         max_frame = np.max(np.stack(self._obs_buffer), axis=0)
-        return max_frame, total_reward, terminated, truncated, info
+        return max_frame, total_rewards, terminated, truncated, info
     
     def reset(self, **kwargs):
         self._obs_buffer.clear()
@@ -110,4 +111,13 @@ def make_env(env_name, render_mode = None):
     env = ProcessFrame84(env)
     env = ImageToPyTorch(env)
     env = BufferWrapper(env, 4)
+    return ScaledFloatFrame(env)
+
+def ale_make_env(env_name, render_mode = None):
+    metadata = {"render_modes": ["human"]}
+    assert render_mode is None or render_mode in metadata["render_modes"]
+    print("Using ALE wrappers")
+
+    env = gym.make(env_name, render_mode= render_mode)
+    env = ImageToPyTorch(env)
     return ScaledFloatFrame(env)
