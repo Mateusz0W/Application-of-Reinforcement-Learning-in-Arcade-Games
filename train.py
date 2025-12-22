@@ -22,6 +22,7 @@ from Networks.noisy import NoisyDQN
 from Memories.replay_memory import ReplayMemory
 from Memories.prio_replay_memory import PrioReplayMemory
 from Memories.n_step_replay_memory import NStepReplayMemory
+from Memories.numpy_replay_memory import NumpyReplayMemory
 
 from plotter import Plotter
 
@@ -46,7 +47,7 @@ def setup(alg, env, hyp: Hyp):
         net = Conv(env.observation_space.shape, env.action_space.n).to(device)
         target_net = Conv(env.observation_space.shape, env.action_space.n).to(device)
         dqn = DQN if alg == "DQN" else DoubleDQN
-        buffer = ReplayMemory(hyp.REPLAY_SIZE)
+        buffer = NumpyReplayMemory(capacity=hyp.REPLAY_SIZE, state_shape=env.observation_space.shape, dtype_state=np.uint8)
         agent = dqn(env, buffer)
         optimizer = optim.Adam(net.parameters(), lr=hyp.LEARNING_RATE)
         process_batch = process_batch_dqn
@@ -65,7 +66,7 @@ def setup(alg, env, hyp: Hyp):
         net = Network(env.observation_space.shape, env.action_space.n).to(device)
         target_net = Network(env.observation_space.shape, env.action_space.n).to(device)
         dqn = DQN 
-        buffer = ReplayMemory(hyp.REPLAY_SIZE)
+        buffer = NumpyReplayMemory(capacity=hyp.REPLAY_SIZE, state_shape=env.observation_space.shape, dtype_state=np.uint8)
         agent = dqn(env, buffer)
         optimizer = optim.Adam(net.parameters(), lr=hyp.LEARNING_RATE)
         process_batch = process_batch_dqn
