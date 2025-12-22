@@ -48,13 +48,15 @@ class ShooterEnv(gym.Env):
             player = self.simulation.players[idx]
             enemy = self.simulation.players[int(not idx)]
 
-            rewards[idx] += 10 * enemy.bullet_hits
-            rewards[idx] -= 10 * player.bullet_hits
-            rewards[idx] -= 50 * player.own_bullet_hits
+            rewards[idx] += 1 * enemy.bullet_hits
+            rewards[idx] -= 1 * player.bullet_hits
+            #rewards[idx] -= 1 * player.own_bullet_hits
             if player.health <= 0:
-                rewards[idx] -= 100
+                rewards[idx] -= 1
             if enemy.health <= 0:
-                rewards[idx] += 100
+                rewards[idx] += 1
+
+            rewards[idx] -= 0.1 *player.missed_shots
             
         return rewards
     
@@ -82,7 +84,7 @@ class ShooterEnv(gym.Env):
 gym.register(
     id = 'Shooter-v0',
     entry_point = 'CustomEnvs.Shooter.environment:ShooterEnv',
-    max_episode_steps = 2_000,
+    max_episode_steps = 4_000,
 )
 
 
