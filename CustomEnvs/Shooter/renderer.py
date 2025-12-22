@@ -1,6 +1,5 @@
 from CustomEnvs.Shooter.config import GameConfig, Colors
 import pygame
-import cv2
 import numpy as np
 import os
 
@@ -48,11 +47,6 @@ class Renderer:
         image = pygame.surfarray.array3d(self.observation_surface)
         image = np.transpose(image, (1, 0, 2))
         return image.astype(np.uint8)
-        # image = pygame.surfarray.array3d(self.screen) 
-        # image = np.transpose(image, (1, 0, 2))
-        # image = cv2.resize(image, (160, 250), interpolation=cv2.INTER_AREA)
-        # return image.astype(np.uint8)
-
 
 
         
