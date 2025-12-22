@@ -1,7 +1,7 @@
 from CustomEnvs.Shooter.player import Player
 from CustomEnvs.Shooter.config import Colors
 from CustomEnvs.Shooter.obstacle import Obstacle
-from CustomEnvs.Shooter.config import GameConfig, ObstacleConfig, Colors, Direction
+from CustomEnvs.Shooter.config import GameConfig, ObstacleConfig, Colors, Direction, PlayerConfig
 import random
 import pygame
 import time
@@ -11,8 +11,8 @@ from CustomEnvs.Shooter.renderer import  Renderer
 class Simulation:
     def __init__(self, render: bool=False, debuging: bool=False) -> None: 
         self.players = [
-            Player(GameConfig.screen_width // 2,50,20,20,5,Colors.Blue, id=1),
-            Player(GameConfig.screen_width // 2,GameConfig.screen_height - 50,20,20,5,Colors.Red, id=2)
+            Player(GameConfig.screen_width // 2,50,PlayerConfig.width,PlayerConfig.height,5,Colors.Blue, id=1),
+            Player(GameConfig.screen_width // 2,GameConfig.screen_height - 50,PlayerConfig.width,PlayerConfig.height,5,Colors.Red, id=2)
         ]
         self.obstacles = self._set_obstacles()
         self.bullets = []
@@ -72,7 +72,7 @@ class Simulation:
         if any(player.health <= 0 for player in self.players):
             self.game_over = True
 
-    
+        self._count_missed_shots()
 
     def _set_obstacles(self) -> list[Obstacle]:
         with open("CustomEnvs/Shooter/map.json" ,'r') as file:
@@ -88,17 +88,15 @@ class Simulation:
             obj.reset_collision_flags()
 
     def delete_bullets(self) -> None:
-        for idx, bullet in enumerate(self.bullets):
-            if bullet.life <= 0:
-                del self.bullets[idx]
+        self.bullets = [b for b in self.bullets if b.life > 0]
 
     def restart_game(self) -> None:
         if not self.game_over:
             return
         
         self.players = [
-            Player(GameConfig.screen_width // 2,50,20,20,5,Colors.Blue, id=1),
-            Player(GameConfig.screen_width // 2,GameConfig.screen_height - 50,20,20,5,Colors.Red, id=2)
+            Player(GameConfig.screen_width // 2,50,PlayerConfig.width,PlayerConfig.height,5,Colors.Blue, id=1),
+            Player(GameConfig.screen_width // 2,GameConfig.screen_height - 50,PlayerConfig.width, PlayerConfig.height,5,Colors.Red, id=2)
         ]
         self.bullets.clear()
         self.game_over = False
@@ -110,6 +108,13 @@ class Simulation:
         space_pressed = True if keys[pygame.K_SPACE] else False
 
         return direction, space_pressed
+    
+    def _count_missed_shots(self):
+        for player in self.players:
+            for bullet in self.bullets:
+                if player.id == bullet.id and bullet.hit_wall:
+                    player.missed_shots += 1
+
 
 
 
