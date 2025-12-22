@@ -7,15 +7,16 @@ Experience = namedtuple('Experience',
 
 class NStepReplayMemory(ReplayMemory):
 
-    def __init__(self, capacity, n):
+    def __init__(self, capacity, n, gamma):
         super().__init__(capacity)
         self.n = n
+        self.gamma = gamma 
 
-    def sample(self, batch_size, gamma):
+    def sample(self, batch_size):
         experiences = []
 
         for _ in range(batch_size):
-            start_idx = np.random.randint(0, len(self.memory))
+            start_idx = np.random.randint(0, len(self.memory) )
             state_0 = self.memory[start_idx].state
             action_0 = self.memory[start_idx].action
             reward = self.memory[start_idx].reward
@@ -23,13 +24,13 @@ class NStepReplayMemory(ReplayMemory):
             last_idx = start_idx
             
             for idx in range(start_idx + 1, min(start_idx + self.n, len(self.memory))):
-                if done:
+                if self.memory[idx - 1].done:
                     break
                 done = self.memory[idx].done
                 last_idx = idx
-                reward += (gamma ** (idx - start_idx)) * self.memory[idx].reward
+                reward += (self.gamma ** (idx - start_idx)) * self.memory[idx].reward
 
-            next_state = self.memory[last_idx].next_state
+            next_state = None if done else self.memory[last_idx].next_state
 
             experiences.append(Experience(state_0, action_0, reward, done, next_state))
 
