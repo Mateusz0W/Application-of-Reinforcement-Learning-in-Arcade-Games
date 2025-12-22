@@ -21,6 +21,7 @@ from Networks.noisy import NoisyDQN
 from Memories.replay_memory import ReplayMemory
 from Memories.prio_replay_memory import PrioReplayMemory
 from Memories.n_step_replay_memory import NStepReplayMemory
+from Memories.numpy_replay_memory import NumpyReplayMemory
 
 from plotter import Plotter
 
@@ -35,7 +36,7 @@ device = torch.device(
 os.makedirs("models", exist_ok=True)
 
 metadata = {
-    "DQNs": ["DQN", "Double_DQN", "PrioDQN", "DuelingDQN", "NoisyDQN", "NStepDQN"],
+    "DQNs": ["DQN", "Double_DQN", "PrioDQN", "DuelingDQN", "NoisyDQN", "NStepDQN", "DDDQN"],
     "Env": ["Shooter-v0"]
     }
 
@@ -50,20 +51,29 @@ def setup(algs: str, env, hyparams: list[Hyp], n_agents: int):
 
     for idx in range(n_agents):
 
-        if algs[idx] in ["DQN","Double_DQN"]:
+        if algs[idx] in ["DDDQN"]:
+            Network = Dueling
+            net = Network(env.observation_space.shape, env.action_space.n).to(device)
+            target_net = Network(env.observation_space.shape, env.action_space.n).to(device)
+            dqn = DoubleDQN
+            buffer = NumpyReplayMemory(capacity=hyparams[idx].REPLAY_SIZE, state_shape=env.observation_space.shape, dtype_state=np.uint8)
+            agent = dqn(env, buffer)
+            optimizer = optim.Adam(net.parameters(), lr=hyparams[idx].LEARNING_RATE)
+
+        elif algs[idx] in ["DQN","Double_DQN"]:
             net = Conv(env.observation_space.shape, env.action_space.n).to(device)
             target_net = Conv(env.observation_space.shape, env.action_space.n).to(device)
             dqn = DQN if algs[idx] == "DQN" else DoubleDQN
-            buffer = ReplayMemory(hyparams[idx].REPLAY_SIZE)
+            buffer = NumpyReplayMemory(capacity=hyparams[idx].REPLAY_SIZE, state_shape=env.observation_space.shape, dtype_state=np.uint8)
             agent = dqn(env, buffer)
             optimizer = optim.Adam(net.parameters(), lr=hyparams[idx].LEARNING_RATE)
 
         elif algs[idx] in ["DuelingDQN", "NoisyDQN"]:
-            Network = Dueling if algs[idx] == "DuelingDQN" else Noisy
+            Network = Dueling 
             net = Network(env.observation_space.shape, env.action_space.n).to(device)
             target_net = Network(env.observation_space.shape, env.action_space.n).to(device)
             dqn = DQN 
-            buffer = ReplayMemory(hyparams[idx].REPLAY_SIZE)
+            buffer = NumpyReplayMemory(capacity=hyparams[idx].REPLAY_SIZE, state_shape=env.observation_space.shape, dtype_state=np.uint8)
             agent = dqn(env, buffer)
             optimizer = optim.Adam(net.parameters(), lr=hyparams[idx].LEARNING_RATE)
 
@@ -103,9 +113,10 @@ if __name__ == "__main__":
 
     env_name = sys.argv[1]
     algorithms = [sys.argv[2], sys.argv[3]]
-    algorithm_param = sys.argv[4]
+    random_agent = sys.argv[4]
     plots = []
     n_agents = 2
+    
     
     assert env_name in metadata["Env"], "Error: Wrong env name"
     fnames = []
@@ -125,7 +136,7 @@ if __name__ == "__main__":
     hyparams = [
         Hyp(
             MEAN_REWARD_BOUND = 800,
-            GAMMA = 0.99 if algorithm != "NStepDQN" else 0.99 ** int(algorithm_param),
+            GAMMA = 0.99, #if algorithm != "NStepDQN" else 0.99 ** int(algorithm_param),
             BATCH_SIZE = 32,
             REPLAY_SIZE = 10_000,
             REPLAY_START_SIZE = 10_000,
@@ -137,7 +148,7 @@ if __name__ == "__main__":
         ),
         Hyp(
             MEAN_REWARD_BOUND = 800,
-            GAMMA = 0.99 if algorithm != "NStepDQN" else 0.99 ** int(algorithm_param),
+            GAMMA = 0.99, #if algorithm != "NStepDQN" else 0.99 ** int(algorithm_param),
             BATCH_SIZE = 32,
             REPLAY_SIZE = 10_000,
             REPLAY_START_SIZE = 10_000,
@@ -145,7 +156,7 @@ if __name__ == "__main__":
             SYNC_TARGET_FRAMES = 1_000,
             EPSILON_DECAY_LAST_FRAME = 150_000,
             EPSILON_START = 1.0,
-            EPSILON_FINAL = 0.01
+            EPSILON_FINAL = 0.01 if not random_agent else 1.
         )]
     nets, target_nets, dqns, agents, optimizers, buffers = setup(algorithms, env, hyparams, n_agents)
 
@@ -199,6 +210,8 @@ if __name__ == "__main__":
                         run = False
             
             for idx, best_mean_reward in enumerate(best_mean_rewards):
+                if random_agent and idx == 1:
+                    continue
                 if len(buffers[idx]) < hyparams[idx].REPLAY_START_SIZE:
                     continue
 
