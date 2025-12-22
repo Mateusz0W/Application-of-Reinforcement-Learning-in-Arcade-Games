@@ -9,8 +9,8 @@ class Direction(Enum):
 
 @dataclass(frozen=True)
 class GameConfig:
-    screen_width: int = 800
-    screen_height: int = 600
+    screen_width: int = 600
+    screen_height: int = 500
     fps: int = 60
     num_of_obstacles: int = 12
 
@@ -33,10 +33,12 @@ class ObstacleConfig:
 class BulletConfig:
     radius: int = 10
     speed: int = 5
-    life: int = 4
+    life: int = 1
     damage: int = 40
 
 @dataclass(frozen=True)
 class PlayerConfig:
     reload_time: int = 1
     health: int = 100
+    width: int = 45
+    height: int = 45
