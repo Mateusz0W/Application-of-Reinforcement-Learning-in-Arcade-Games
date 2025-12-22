@@ -19,6 +19,7 @@ class Player(Entity):
         self.last_position = (x, y)
         self.bullet_hits = 0
         self.own_bullet_hits = 0
+        self.missed_shots = 0
 
     def update_position(self, direction: Direction) -> None:
         self.last_position = (self.x, self.y)
@@ -83,5 +84,6 @@ class Player(Entity):
     def reset_counters(self) -> None:
         self.bullet_hits = 0
         self.own_bullet_hits = 0
+        self.missed_shots = 0
             
         

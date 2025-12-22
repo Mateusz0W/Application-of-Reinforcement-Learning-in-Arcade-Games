@@ -13,6 +13,7 @@ class Bullet(Entity):
         self.angle = angle
         self.life = life
         self.id = id
+        self.hit_wall = False
 
     def update_position(self) -> None:
         self.x += self.speed_x * math.cos(math.radians(self.angle))
@@ -41,15 +42,18 @@ class Bullet(Entity):
                     self.speed_y *= -1
                     
                 self.life -= 1
+                self.hit_wall = True
                 break
         
         if not 0 <= self.x <= GameConfig.screen_width:
             self.speed_x *= -1
             self.life -= 1
+            self.hit_wall = True
 
         if not 0 <= self.y <= GameConfig.screen_height:
             self.speed_y *= -1
             self.life -= 1
+            self.hit_wall = True
 
         self.update_position()
 
