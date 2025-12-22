@@ -3,7 +3,7 @@ import torch.optim as optim
 import numpy as np
 import gymnasium as gym
 import os
-import ale_py
+#import ale_py
 import Wrappers
 from  tensorboardX import SummaryWriter
 import time
@@ -17,7 +17,7 @@ from Config.config import Hyperparameters as Hyp
 
 from Networks.conv import Conv
 from Networks.dueling import Dueling
-from Networks.noisy import Noisy
+from Networks.noisy import NoisyDQN
 
 from Memories.replay_memory import ReplayMemory
 from Memories.prio_replay_memory import PrioReplayMemory
@@ -37,15 +37,15 @@ os.makedirs("models", exist_ok=True)
 
 metadata = {
     "DQNs": ["DQN", "Double_DQN", "PrioDQN", "DuelingDQN", "NoisyDQN", "NStepDQN"],
-    "Env": ["ALE/MsPacman-v5", "Shooter-v0", "ALE/Breakout-v5"]
+    "Env": ["BoxingNoFrameskip-v4", "PongNoFrameskip-v4"]
     }
 
 def setup(alg, env, hyp: Hyp):
 
-    if alg == "DQN" or "Double_DQN":
+    if alg in ["DQN", "Double_DQN"]:
         net = Conv(env.observation_space.shape, env.action_space.n).to(device)
         target_net = Conv(env.observation_space.shape, env.action_space.n).to(device)
-        dqn = DQN if "DQN" else DoubleDQN
+        dqn = DQN if alg == "DQN" else DoubleDQN
         buffer = ReplayMemory(hyp.REPLAY_SIZE)
         agent = dqn(env, buffer)
         optimizer = optim.Adam(net.parameters(), lr=hyp.LEARNING_RATE)
@@ -60,8 +60,8 @@ def setup(alg, env, hyp: Hyp):
         optimizer = optim.Adam(net.parameters(), lr=hyp.LEARNING_RATE)
         process_batch = process_batch_prio_dqn
 
-    elif alg == "DuelingDQN" or "NoisyDQN":
-        Network = Dueling if "DuelingDQN" else Noisy
+    elif alg in ["DuelingDQN", "NoisyDQN"]:
+        Network = Dueling if alg == "DuelingDQN" else NoisyDQN
         net = Network(env.observation_space.shape, env.action_space.n).to(device)
         target_net = Network(env.observation_space.shape, env.action_space.n).to(device)
         dqn = DQN 
@@ -75,7 +75,7 @@ def setup(alg, env, hyp: Hyp):
         net = Conv(env.observation_space.shape, env.action_space.n).to(device)
         target_net = Conv(env.observation_space.shape, env.action_space.n).to(device)
         dqn = DQN 
-        buffer = NStepReplayMemory(hyp.REPLAY_SIZE, n)
+        buffer = NStepReplayMemory(hyp.REPLAY_SIZE, n, hyp.GAMMA)
         agent = dqn(env, buffer)
         optimizer = optim.Adam(net.parameters(), lr=hyp.LEARNING_RATE)
         process_batch = process_batch_dqn
@@ -123,23 +123,20 @@ if __name__ == "__main__":
     assert algorithm in metadata["DQNs"], "Error: Wrong algortihm name"
     #assert algorithm == "NStepDQN" and len(sys.argv) != 4 and int(algorithm_param) < 0, "Error: Missing n argument or n must be non-negative"
 
-    gym.register_envs(ale_py)
-    if env_name == "ALE/MsPacman-v5": #"ALE/MsPacman-v5":
-        env = Wrappers.make_env(env_name)
-    else:
-        env = Wrappers.make_env(env_name, render_mode='human')
-        #env = Wrappers.make_env(env_name)
+    #gym.register_envs(ale_py)
+    env = Wrappers.make_env(env_name)
+
     hyp = Hyp(
-        MEAN_REWARD_BOUND = 540,
-        GAMMA = 0.99 if algorithm != "NStepDQN" else 0.99 ** int(algorithm_param),
+        MEAN_REWARD_BOUND = 2500,
+        GAMMA = 0.99,
         BATCH_SIZE = 32,
         REPLAY_SIZE = 10_000,
         REPLAY_START_SIZE = 10_000,
         LEARNING_RATE = 1e-4,
         SYNC_TARGET_FRAMES = 1_000,
         EPSILON_DECAY_LAST_FRAME = 150_000,
-        EPSILON_START = 1.0,
-        EPSILON_FINAL = 0.01
+        EPSILON_START = 0.0,
+        EPSILON_FINAL = 0.0
     )
     net, target_net, dqn, agent, optimizer, process_batch, buffer = setup(algorithm, env, hyp)
     writer = SummaryWriter(comment=env_name)
@@ -149,7 +146,7 @@ if __name__ == "__main__":
     ts_frame = 0
     ts = time.time()
     best_mean_reward = None 
-    print(f"device = {device}\nnetwork = {net}")
+    print(f"alg = {dqn}\ndevice = {device}\nnetwork = {net}")
     print(hyp)
     start_time = time.time()
     current_ep_steps = 0
