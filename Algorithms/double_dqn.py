@@ -8,10 +8,10 @@ class DoubleDQN(DQN):
         super().__init__(env, exp_buffer)
     
     @staticmethod
-    def calc_loss_double_dqn(batch, net, tgt_net, GAMMA, device = 'cpu'):
+    def calc_loss(batch, net, tgt_net, GAMMA, device = 'cpu'):
         states, actions, rewards, dones, next_states = zip(*batch)
-        states_v = torch.tensor(np.array(states, copy = False)).to(device)
-        next_states_v = torch.tensor(np.array(next_states, copy = False)).to(device)
+        states_v = torch.tensor(np.asarray(states)).to(device)
+        next_states_v = torch.tensor(np.asarray(next_states)).to(device)
         actions_v = torch.tensor(actions).to(device)
         rewards_v = torch.tensor(rewards).to(device)
         done_mask = torch.BoolTensor(dones).to(device)
@@ -24,5 +24,7 @@ class DoubleDQN(DQN):
         next_state_values[done_mask] = 0.
         next_state_values = next_state_values.detach()
 
+        mean_q = state_action_values.mean().item()
+
         expected_state_action_values = next_state_values * GAMMA + rewards_v
-        return nn.MSELoss()(state_action_values, expected_state_action_values)
+        return nn.MSELoss()(state_action_values, expected_state_action_values), mean_q
