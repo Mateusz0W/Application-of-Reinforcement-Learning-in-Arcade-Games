@@ -48,8 +48,8 @@ class ShooterEnv(gym.Env):
             player = self.simulation.players[idx]
             enemy = self.simulation.players[int(not idx)]
 
-            rewards[idx] += 1 * enemy.bullet_hits
-            rewards[idx] -= 1 * player.bullet_hits
+            rewards[idx] += 5 * enemy.bullet_hits
+            rewards[idx] -= 5 * player.bullet_hits
             #rewards[idx] -= 1 * player.own_bullet_hits
             if player.health <= 0:
                 rewards[idx] -= 1
