@@ -56,7 +56,7 @@ class ShooterEnv(gym.Env):
             if enemy.health <= 0:
                 rewards[idx] += 1
 
-            rewards[idx] -= 0.1 *player.missed_shots
+            #rewards[idx] -= 0.1 *player.missed_shots
             
         return rewards
     
